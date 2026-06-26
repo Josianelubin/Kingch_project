@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Supprimer le compte {{ user_obj.username }} | Admin{% endblock %}
+
+{% block content %}
+<div style="max-width:520px; margin:0 auto;">
+  <div style="background:#1C1C2E; border:2px solid rgba(231,76,60,0.4); border-radius:16px; padding:2.5rem; margin-top:1rem;">
+
+    <div style="text-align:center; margin-bottom:2rem;">
+      <div style="font-size:2.5rem; margin-bottom:0.8rem;">&#128465;</div>
+      <h1 style="color:#e74c3c; font-size:1.4rem; font-weight:800; margin-bottom:0.5rem;">
+        Supprimer le compte
+      </h1>
+      <p style="color:#E8E8F0; font-size:1rem; font-weight:700;">{{ user_obj.username }}</p>
+      <p style="color:#8892A4; font-size:0.85rem; margin-top:0.5rem;">
+        Cette action est <strong style="color:#e74c3c;">definitive et irreversible</strong>.
+        Toutes les donnees seront supprimees.
+      </p>
+    </div>
+
+    <div style="background:rgba(231,76,60,0.06); border:1px solid rgba(231,76,60,0.2); border-radius:10px; padding:1rem; margin-bottom:1.5rem;">
+      <p style="color:#8892A4; font-size:0.83rem; margin:0; line-height:1.7;">
+        Seront supprimes: profil, reponses, certificats, notifications et toutes les donnees associees.
+      </p>
+    </div>
+
+    <form method="post" action="{{ form_url }}">
+      {% csrf_token %}
+      <div style="margin-bottom:1.2rem;">
+        <label style="display:block; color:#8892A4; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.5rem;">
+          Tapez <strong style="color:#e74c3c; font-family:monospace;">{{ user_obj.username }}</strong> pour confirmer
+        </label>
+        <input
+          type="text"
+          name="confirm"
+          placeholder="{{ user_obj.username }}"
+          autocomplete="off"
+          style="width:100%; background:rgba(231,76,60,0.05); border:2px solid rgba(231,76,60,0.3); border-radius:10px; padding:0.9rem 1rem; color:#E8E8F0; font-size:1rem; font-family:monospace;"
+          required
+        >
+      </div>
+      <div style="display:flex; gap:0.8rem;">
+        <button type="submit" style="flex:1; padding:0.85rem; border:none; border-radius:10px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#e74c3c,#c0392b); color:white;">
+          Supprimer definitivement
+        </button>
+        <a href="{% url 'admin:auth_user_changelist' %}" style="flex:1; padding:0.85rem; border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-weight:600; background:rgba(255,255,255,0.04); color:#8892A4; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

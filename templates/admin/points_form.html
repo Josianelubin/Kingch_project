@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | Admin{% endblock %}
+
+{% block content %}
+<div style="max-width:520px; margin:0 auto;">
+
+  <div style="background:#1C1C2E; border:1px solid rgba(212,160,23,0.25); border-radius:16px; padding:2rem; margin-top:1rem;">
+
+    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,#D4A017,#B8860B); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">
+        {% if action_label == 'Ajouter' %}+{% else %}-{% endif %}
+      </div>
+      <div>
+        <div style="font-size:1.1rem; font-weight:700; color:#E8E8F0;">{{ title }}</div>
+        <div style="color:#8892A4; font-size:0.85rem; margin-top:0.2rem;">{{ subtitle }}</div>
+      </div>
+    </div>
+
+    {% if messages %}
+    {% for msg in messages %}
+    <div style="background:rgba(231,76,60,0.12); border:1px solid rgba(231,76,60,0.3); border-radius:8px; padding:0.8rem 1rem; margin-bottom:1rem; color:#e74c3c; font-size:0.9rem;">
+      {{ msg }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{{ form_url }}">
+      {% csrf_token %}
+
+      <div style="margin-bottom:1.2rem;">
+        <label style="display:block; color:#8892A4; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.5rem;">
+          Nombre de points
+        </label>
+        <input
+          type="number"
+          name="points"
+          min="1"
+          max="10000"
+          value="10"
+          autofocus
+          style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:0.9rem 1rem; color:#E8E8F0; font-size:1rem; font-family:inherit;"
+          required
+        >
+      </div>
+
+      <div style="display:flex; gap:0.8rem; margin-top:1.5rem;">
+        <button
+          type="submit"
+          style="flex:1; padding:0.8rem; border:none; border-radius:10px; font-weight:700; font-size:0.95rem; cursor:pointer;
+          {% if btn_color == 'success' %}background:linear-gradient(135deg,#2ecc71,#27ae60); color:#0D0D14;
+          {% else %}background:linear-gradient(135deg,#e74c3c,#c0392b); color:white;{% endif %}"
+        >
+          {% if action_label == 'Ajouter' %}Ajouter les points{% else %}Retirer les points{% endif %}
+        </button>
+        <a
+          href="{% url 'admin:auth_user_changelist' %}"
+          style="flex:1; padding:0.8rem; border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; background:rgba(255,255,255,0.04); color:#8892A4; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;"
+        >
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

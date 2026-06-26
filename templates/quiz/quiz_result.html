@@ -1,0 +1,119 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Résultat - KING CH{% endblock %}
+
+{% block extra_css %}
+<style>
+.result-container { max-width: 580px; margin: 3rem auto; text-align: center; }
+
+.result-icon {
+    font-size: 6rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.result-card {
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-card.correct {
+    border: 2px solid rgba(46,204,113,0.4);
+    background: rgba(46,204,113,0.06);
+}
+
+.result-card.wrong {
+    border: 2px solid rgba(231,76,60,0.4);
+    background: rgba(231,76,60,0.06);
+}
+
+.result-title { font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem; }
+.result-title.correct-text { color: #2ecc71; }
+.result-title.wrong-text { color: #e74c3c; }
+
+.points-gained {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 1rem 0;
+}
+
+.answer-review {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.answer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.9rem;
+}
+
+.answer-row:last-child { border-bottom: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    {% if answer.is_correct %}
+    <span class="result-icon">🏆</span>
+    <div class="result-card correct">
+        <div class="result-title correct-text">Bonne réponse!</div>
+        <p style="color:var(--gray);">Félicitations, vous avez répondu correctement!</p>
+        <div class="points-gained">+{{ answer.points_earned }}</div>
+        <div style="color:var(--gray); font-size:0.9rem;">points ajoutés à votre compte</div>
+    </div>
+    {% else %}
+    <span class="result-icon">😔</span>
+    <div class="result-card wrong">
+        <div class="result-title wrong-text">Mauvaise réponse</div>
+        <p style="color:var(--gray);">Ne vous découragez pas, continuez à apprendre!</p>
+        <div class="points-gained" style="background: linear-gradient(135deg, #e74c3c, #c0392b); -webkit-background-clip: text; background-clip: text;">+0</div>
+        <div style="color:var(--gray); font-size:0.9rem;">points cette fois-ci</div>
+    </div>
+    {% endif %}
+
+    <div class="answer-review">
+        <div class="answer-row">
+            <span style="color:var(--gray);">Question :</span>
+            <span style="max-width:300px; text-align:right;">{{ question.question_text|truncatechars:60 }}</span>
+        </div>
+        <div class="answer-row">
+            <span style="color:var(--gray);">Votre réponse :</span>
+            <span style="color:{% if answer.is_correct %}#2ecc71{% else %}#e74c3c{% endif %}; font-weight:700;">
+                ({{ answer.selected_answer }}) {% if answer.selected_answer == 'A' %}{{ question.option_a }}{% elif answer.selected_answer == 'B' %}{{ question.option_b }}{% elif answer.selected_answer == 'C' %}{{ question.option_c }}{% else %}{{ question.option_d }}{% endif %}
+            </span>
+        </div>
+        {% if not answer.is_correct %}
+        <div class="answer-row">
+            <span style="color:var(--gray);">Bonne réponse :</span>
+            <span style="color:#2ecc71; font-weight:700;">
+                ({{ question.correct_answer }}) {% if question.correct_answer == 'A' %}{{ question.option_a }}{% elif question.correct_answer == 'B' %}{{ question.option_b }}{% elif question.correct_answer == 'C' %}{{ question.option_c }}{% else %}{{ question.option_d }}{% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="{% url 'dashboard' %}" class="btn btn-gold">🏠 Retour au dashboard</a>
+        <a href="{% url 'leaderboard' %}" class="btn btn-outline">🏆 Classement</a>
+    </div>
+</div>
+{% endblock %}

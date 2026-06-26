@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Createur - KING CH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #D4A017;
+      --gold-light: #F5CC5A;
+      --black: #080810;
+      --dark: #0F0F1A;
+      --dark2: #161626;
+      --dark3: #1E1E32;
+      --border: rgba(212,160,23,0.2);
+      --text: #E0E0F0;
+      --muted: #7A8499;
+      --green: #2ecc71;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 70% 40% at 50% 0%, rgba(212,160,23,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 30% at 80% 100%, rgba(100,60,200,0.05) 0%, transparent 50%);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,16,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 3px;
+    }
+    .back-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 1rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .back-link:hover { color: var(--gold); border-color: var(--border); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+    }
+    .profile-ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      background: linear-gradient(135deg, var(--dark2), var(--dark3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 40px rgba(212,160,23,0.2);
+    }
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+    }
+    .hero-title {
+      color: var(--gold);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 0.8rem;
+    }
+    .hero-subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /* ── GRID ── */
+    .page-grid {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    @media (max-width: 680px) { .page-grid { grid-template-columns: 1fr; padding: 0 1rem 3rem; } }
+    .full-width { grid-column: 1 / -1; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.6rem;
+    }
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-title::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    /* ── INFO ROW ── */
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 1rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .info-val {
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    /* ── PERSON CARD (family / friends) ── */
+    .person-card {
+      background: var(--dark3);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.7rem;
+    }
+    .person-name { font-weight: 700; color: var(--text); font-size: 0.93rem; }
+    .person-role { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
+    .person-detail { color: var(--gold); font-size: 0.78rem; margin-top: 0.3rem; font-weight: 500; }
+
+    /* ── PASSION TAG ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .tag {
+      background: rgba(212,160,23,0.1);
+      border: 1px solid rgba(212,160,23,0.25);
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+    }
+
+    /* ── DIVIDER ── */
+    hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 0.8rem 0; }
+
+    /* ── QUOTE ── */
+    .quote {
+      background: linear-gradient(135deg, rgba(212,160,23,0.08), rgba(212,160,23,0.02));
+      border-left: 4px solid var(--gold);
+      border-radius: 0 12px 12px 0;
+      padding: 1.2rem 1.5rem;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.8;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="brand">KING CH</a>
+  <a href="/" class="back-link">Retour au site</a>
+</nav>
+
+<div class="hero">
+  <div class="profile-ring">E</div>
+  <h1 class="hero-name">Emmanuel Christopher Badio</h1>
+  <div class="hero-title">Createur &amp; Fondateur de KING CH</div>
+  <p class="hero-subtitle">Passione d'informatique, de livres et d'apprentissage. Eleve distingue du Lycee Henri Christophe.</p>
+</div>
+
+<div class="page-grid">
+
+  <!-- Identite -->
+  <div class="card">
+    <div class="card-title">Identite</div>
+    <div class="info-row"><span class="info-key">Nom complet</span><span class="info-val">Emmanuel Christopher Badio</span></div>
+    <div class="info-row"><span class="info-key">Date de naissance</span><span class="info-val">5 fevrier 2006</span></div>
+    <div class="info-row"><span class="info-key">Age</span><span class="info-val">20 ans</span></div>
+    <div class="info-row"><span class="info-key">Origine</span><span class="info-val">Haiti</span></div>
+    <div class="info-row"><span class="info-key">Quartier</span><span class="info-val">Martissant 4</span></div>
+  </div>
+
+  <!-- Scolarite -->
+  <div class="card">
+    <div class="card-title">Scolarite</div>
+    <div class="info-row"><span class="info-key">Etablissement</span><span class="info-val">Istitution mixte washington</span></div>
+    <div class="info-row"><span class="info-key">Classe</span><span class="info-val">NS2</span></div>
+    <div class="info-row"><span class="info-key">Rang</span><span class="info-val">Premier de la classe</span></div>
+    <div class="info-row"><span class="info-key">Discipline preferee</span><span class="info-val">Toutes (meilleur eleve)</span></div>
+  </div>
+
+  <!-- Passions -->
+  <div class="card">
+    <div class="card-title">Passions &amp; Interets</div>
+    <div class="tags">
+      <span class="tag">Informatique</span>
+      <span class="tag">Programmation</span>
+      <span class="tag">Lecture</span>
+      <span class="tag">Sciences</span>
+      <span class="tag">Mathematiques</span>
+      <span class="tag">Apprentissage</span>
+      <span class="tag">Technologie</span>
+      <span class="tag">Quiz & Culture</span>
+    </div>
+    <hr>
+    <div class="quote">
+      "Il est passionne de livres, il aime etudier beaucoup et se consacre entierement a sa formation intellectuelle."
+    </div>
+  </div>
+
+  <!-- Famille -->
+  <div class="card">
+    <div class="card-title">Famille</div>
+
+    <div class="person-card">
+      <div class="person-name">Josiane Lubin</div>
+      <div class="person-role">Mere</div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Patrick Badio</div>
+      <div class="person-role">Frere</div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Joseph Ismael Badio</div>
+      <div class="person-role">Frere - Ingenieur en informatique</div>
+      <div class="person-detail">Ne le 18 aout 2008 a Martissant 4 (hopital Sans Frontiere)</div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Sandrina Roger</div>
+      <div class="person-role">Soeur</div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Herbina Roger</div>
+      <div class="person-role">Soeur</div>
+    </div>
+  </div>
+
+  <!-- Amis -->
+  <div class="card full-width">
+    <div class="card-title">Amis proches</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:0.8rem;">
+
+      <div class="person-card">
+        <div class="person-name">Jean Baptiste Emmanuel</div>
+        <div class="person-role">Ami proche</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-name">Francois Kerby</div>
+        <div class="person-role">Ami proche</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-name">Joseph Jovany</div>
+        <div class="person-role">Ami proche</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A propos du site -->
+  <div class="card full-width">
+    <div class="card-title">A propos de KING CH</div>
+    <p style="color:var(--muted); font-size:0.9rem; line-height:1.8;">
+      KING CH est une plateforme de quiz interactive creee par Emmanuel Christopher Badio. Ce projet reflete sa passion pour la technologie et son desir de rendre l'apprentissage ludique et accessible a tous. Developpe avec Django, Python et des technologies web modernes, KING CH propose des questions quotidiennes, un systeme de points, des certificats officiels et un classement en temps reel.
+    </p>
+    <div class="tags" style="margin-top:1rem;">
+      <span class="tag">Python</span>
+      <span class="tag">Django</span>
+      <span class="tag">HTML / CSS</span>
+      <span class="tag">SQLite</span>
+      <span class="tag">Render.com</span>
+      <span class="tag">Jazzmin Admin</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div style="font-family:'Cinzel Decorative',cursive; font-size:1.1rem; color:var(--gold); margin-bottom:0.8rem;">KING CH</div>
+  Cree par <strong style="color:var(--text);">Emmanuel Christopher Badio</strong> &mdash; Haiti, Martissant 4<br>
+  <span style="margin-top:0.4rem; display:block;">
+    <a href="/">Accueil</a> &nbsp;&middot;&nbsp;
+    <a href="https://chat.whatsapp.com/DfogG8AXfRVA92eIwvpHJd?s=sw&p=a&mlu=4&amv=3" target="_blank">WhatsApp</a>
+  </span>
+</footer>
+
+</body>
+</html>

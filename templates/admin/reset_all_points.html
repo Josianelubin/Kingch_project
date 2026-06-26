@@ -1,0 +1,79 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Reinitialiser tous les points | Admin{% endblock %}
+
+{% block content %}
+<div style="max-width:560px; margin:0 auto;">
+
+  <div style="background:#1C1C2E; border:2px solid rgba(231,76,60,0.4); border-radius:16px; padding:2.5rem; margin-top:1rem;">
+
+    <div style="text-align:center; margin-bottom:2rem;">
+      <div style="font-size:3.5rem; margin-bottom:0.8rem;">
+        <span style="background:linear-gradient(135deg,rgba(231,76,60,0.2),rgba(231,76,60,0.05)); border:2px solid rgba(231,76,60,0.4); border-radius:50%; width:80px; height:80px; display:inline-flex; align-items:center; justify-content:center;">
+          &#9888;
+        </span>
+      </div>
+      <h1 style="color:#e74c3c; font-size:1.5rem; font-weight:800; margin-bottom:0.5rem;">
+        Reinitialiser tous les points
+      </h1>
+      <p style="color:#8892A4; font-size:0.9rem; line-height:1.6;">
+        Cette action est <strong style="color:#e74c3c;">irreversible</strong>.<br>
+        Les points de tous les utilisateurs seront remis a <strong style="color:#e74c3c;">zero</strong>.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.2rem; text-align:center;">
+        <div style="font-size:2rem; font-weight:900; color:#D4A017;">{{ total_users }}</div>
+        <div style="color:#8892A4; font-size:0.8rem; margin-top:0.3rem;">Utilisateurs affectes</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.2rem; text-align:center;">
+        <div style="font-size:2rem; font-weight:900; color:#e74c3c;">{{ total_pts }}</div>
+        <div style="color:#8892A4; font-size:0.8rem; margin-top:0.3rem;">Points qui seront supprimes</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(231,76,60,0.08); border:1px solid rgba(231,76,60,0.2); border-radius:10px; padding:1rem 1.2rem; margin-bottom:1.5rem;">
+      <div style="font-size:0.85rem; color:#e74c3c; font-weight:600; margin-bottom:0.4rem;">
+        Toutes les notifications seront envoyees automatiquement aux utilisateurs.
+      </div>
+      <div style="font-size:0.82rem; color:#8892A4;">
+        Chaque utilisateur recevra un message indiquant que ses points ont ete reinitialises.
+      </div>
+    </div>
+
+    <form method="post" action="{{ form_url }}">
+      {% csrf_token %}
+
+      <div style="margin-bottom:1.2rem;">
+        <label style="display:block; color:#8892A4; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.5rem;">
+          Tapez <strong style="color:#e74c3c; font-family:monospace;">REINITIALISER</strong> pour confirmer
+        </label>
+        <input
+          type="text"
+          name="confirm"
+          placeholder="REINITIALISER"
+          autocomplete="off"
+          style="width:100%; background:rgba(231,76,60,0.05); border:2px solid rgba(231,76,60,0.3); border-radius:10px; padding:0.9rem 1rem; color:#E8E8F0; font-size:1rem; font-family:monospace; letter-spacing:1px;"
+          required
+        >
+      </div>
+
+      <div style="display:flex; gap:0.8rem;">
+        <button
+          type="submit"
+          style="flex:1; padding:0.9rem; border:none; border-radius:10px; font-weight:700; font-size:0.95rem; cursor:pointer; background:linear-gradient(135deg,#e74c3c,#c0392b); color:white;"
+        >
+          Reinitialiser TOUS les points
+        </button>
+        <a
+          href="{% url 'admin:auth_user_changelist' %}"
+          style="flex:1; padding:0.9rem; border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-weight:600; font-size:0.95rem; background:rgba(255,255,255,0.04); color:#8892A4; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;"
+        >
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

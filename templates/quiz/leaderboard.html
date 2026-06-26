@@ -1,0 +1,146 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Classement - KING CH{% endblock %}
+
+{% block extra_css %}
+<style>
+.podium {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    align-items: end;
+}
+
+.podium-item {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+}
+
+.podium-1 {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.08));
+    border: 2px solid rgba(255,215,0,0.4);
+    order: 2;
+}
+
+.podium-2 {
+    background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(128,128,128,0.05));
+    border: 1px solid rgba(192,192,192,0.3);
+    order: 1;
+}
+
+.podium-3 {
+    background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(150,80,20,0.05));
+    border: 1px solid rgba(205,127,50,0.3);
+    order: 3;
+}
+
+.podium-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+.podium-name { font-weight: 800; font-size: 1rem; }
+.podium-pts { color: var(--gold); font-weight: 700; margin-top: 0.3rem; }
+
+.leader-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 0.6rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.leader-row:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,215,0,0.1); }
+.leader-row.me { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.06); }
+
+.rank-badge {
+    min-width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.05);
+    color: var(--gray);
+}
+
+.rank-badge.r1 { background: rgba(255,215,0,0.2); color: var(--gold); font-size: 1.2rem; }
+.rank-badge.r2 { background: rgba(192,192,192,0.2); color: #C0C0C0; font-size: 1.2rem; }
+.rank-badge.r3 { background: rgba(205,127,50,0.2); color: #CD7F32; font-size: 1.2rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:700px; margin:0 auto;">
+    <div style="text-align:center; margin-bottom:2rem;">
+        <span style="font-size:3rem;">🏆</span>
+        <h1 style="font-size:1.8rem; font-weight:800; margin-top:0.5rem;">Classement KING CH</h1>
+        <p style="color:var(--gray); margin-top:0.5rem;">Votre rang: <strong style="color:var(--gold);">#{{ my_rank }}</strong></p>
+    </div>
+
+    <!-- Podium TOP 3 -->
+    {% if leaders.count >= 3 %}
+    <div class="podium">
+        <div class="podium-item podium-2">
+            <span class="podium-icon">🥈</span>
+            <div class="podium-name">{{ leaders.1.user.first_name|default:leaders.1.user.username }}</div>
+            <div class="podium-pts">{{ leaders.1.total_points }} ⭐</div>
+        </div>
+        <div class="podium-item podium-1">
+            <span class="podium-icon">👑</span>
+            <div class="podium-name">{{ leaders.0.user.first_name|default:leaders.0.user.username }}</div>
+            <div class="podium-pts">{{ leaders.0.total_points }} ⭐</div>
+        </div>
+        <div class="podium-item podium-3">
+            <span class="podium-icon">🥉</span>
+            <div class="podium-name">{{ leaders.2.user.first_name|default:leaders.2.user.username }}</div>
+            <div class="podium-pts">{{ leaders.2.total_points }} ⭐</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Full list -->
+    <div class="card">
+        <h3 class="section-title"><span class="icon">📊</span> Classement complet</h3>
+        {% for leader in leaders %}
+        <div class="leader-row {% if leader.user == user %}me{% endif %}">
+            <div class="rank-badge {% if forloop.counter == 1 %}r1{% elif forloop.counter == 2 %}r2{% elif forloop.counter == 3 %}r3{% endif %}">
+                {% if forloop.counter == 1 %}👑
+                {% elif forloop.counter == 2 %}🥈
+                {% elif forloop.counter == 3 %}🥉
+                {% else %}{{ forloop.counter }}{% endif %}
+            </div>
+            <div style="flex:1;">
+                <div style="font-weight:600;">
+                    <a href="{% url 'profile_detail' leader.user.username %}" style="color:var(--white); text-decoration:none;">
+                        {{ leader.user.first_name|default:leader.user.username }}
+                        {% if leader.user.last_name %} {{ leader.user.last_name }}{% endif %}
+                    </a>
+                    {% if leader.user == user %}
+                    <span class="badge badge-gold" style="font-size:0.65rem; margin-left:0.4rem;">VOUS</span>
+                    {% endif %}
+                </div>
+                <div style="color:var(--gray); font-size:0.8rem; margin-top:0.2rem;">
+                    @{{ leader.user.username }}
+                </div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:1.1rem; font-weight:900; color:var(--gold);">{{ leader.total_points }} ⭐</div>
+                <div style="color:var(--gray); font-size:0.75rem;">points</div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align:center; color:var(--gray); padding:2rem;">
+            Aucun joueur dans le classement.
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline">← Retour au dashboard</a>
+    </div>
+</div>
+{% endblock %}

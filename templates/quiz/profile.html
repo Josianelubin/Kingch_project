@@ -1,0 +1,190 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Profil de {{ profile_user.username }} - KING CH{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-header {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(123,47,190,0.08));
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 20px;
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.avatar-wrap {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--dark2), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--white);
+}
+
+.profile-username { color: var(--gray); font-size: 0.95rem; margin-top: 0.2rem; }
+
+.profile-bio { color: var(--gray); font-size: 0.9rem; margin-top: 0.6rem; max-width: 500px; }
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.stat-box .val { font-size: 1.8rem; font-weight: 900; color: var(--gold); }
+.stat-box .lbl { color: var(--gray); font-size: 0.8rem; margin-top: 0.2rem; }
+
+.answer-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.answer-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    font-size: 0.88rem;
+}
+
+.answer-row.correct-row { border-left: 3px solid #2ecc71; }
+.answer-row.wrong-row { border-left: 3px solid #e74c3c; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="avatar-wrap">
+        {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="Avatar">
+        {% else %}
+            👤
+        {% endif %}
+    </div>
+    <div>
+        <div class="profile-name">
+            {{ profile_user.first_name }} {{ profile_user.last_name }}
+            {% if profile.is_blocked %}
+            <span class="badge badge-red" style="font-size:0.7rem;">BLOQUÉ</span>
+            {% endif %}
+        </div>
+        <div class="profile-username">@{{ profile_user.username }}</div>
+        {% if profile.bio %}
+        <div class="profile-bio">{{ profile.bio }}</div>
+        {% endif %}
+        <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+            {% if profile.whatsapp %}
+            <a href="https://wa.me/{{ profile.whatsapp|cut:'+' }}" target="_blank" style="display:flex; align-items:center; gap:0.4rem; color:#25D366; font-size:0.85rem; text-decoration:none;">
+                💬 WhatsApp
+            </a>
+            {% endif %}
+            <span style="color:var(--gray); font-size:0.85rem;">
+                📅 Membre depuis {{ profile_user.date_joined|date:"M Y" }}
+            </span>
+            <span class="badge badge-gold">🏅 Rang #{{ rank }}</span>
+        </div>
+    </div>
+    {% if user == profile_user %}
+    <div style="margin-left:auto;">
+        <a href="{% url 'edit_profile' %}" class="btn btn-outline">✏️ Modifier</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="val">{{ profile.total_points }}</div>
+        <div class="lbl">Points totaux</div>
+    </div>
+    <div class="stat-box">
+        <div class="val">{{ correct_count }}</div>
+        <div class="lbl">Bonnes réponses</div>
+    </div>
+    <div class="stat-box">
+        <div class="val">{{ total_count }}</div>
+        <div class="lbl">Questions répondues</div>
+    </div>
+    <div class="stat-box">
+        <div class="val">
+            {% if total_count > 0 %}
+                {% widthratio correct_count total_count 100 %}%
+            {% else %}0%{% endif %}
+        </div>
+        <div class="lbl">Taux de réussite</div>
+    </div>
+    <div class="stat-box">
+        <div class="val">{{ certificates.count }}</div>
+        <div class="lbl">Certificats</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:2rem;">
+    <!-- Historique des réponses -->
+    <div class="card">
+        <h3 class="section-title"><span class="icon">📊</span> Historique des réponses</h3>
+        <div class="answer-history">
+            {% for answer in answers %}
+            <div class="answer-row {% if answer.is_correct %}correct-row{% else %}wrong-row{% endif %}">
+                <span style="min-width:20px;">{% if answer.is_correct %}✅{% else %}❌{% endif %}</span>
+                <span style="flex:1; color:var(--gray);">{{ answer.question.question_text|truncatechars:70 }}</span>
+                <span style="color:{% if answer.is_correct %}#2ecc71{% else %}#e74c3c{% endif %}; font-weight:700; white-space:nowrap;">
+                    {{ answer.points_earned }} pts
+                </span>
+                <span style="color:var(--gray); font-size:0.8rem; white-space:nowrap;">{{ answer.answered_at|date:"d/m" }}</span>
+            </div>
+            {% empty %}
+            <div style="text-align:center; color:var(--gray); padding:2rem;">
+                Aucune réponse pour le moment.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Certificats -->
+    <div>
+        <div class="card">
+            <h3 class="section-title"><span class="icon">🏆</span> Certificats</h3>
+            {% for cert in certificates %}
+            <div style="background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,165,0,0.05)); border:1px solid rgba(255,215,0,0.3); border-radius:12px; padding:1rem; margin-bottom:0.8rem;">
+                <div style="font-weight:700; color:var(--gold);">🎖 {{ cert.title }}</div>
+                <div style="color:var(--gray); font-size:0.8rem; margin-top:0.3rem;">{{ cert.issued_at|date:"d/m/Y" }}</div>
+                {% if cert.certificate_file %}
+                <a href="{{ cert.certificate_file.url }}" class="btn btn-gold" style="margin-top:0.6rem; padding:0.3rem 0.8rem; font-size:0.8rem;" target="_blank">📥</a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div style="text-align:center; color:var(--gray); padding:1rem; font-size:0.9rem;">
+                Pas encore de certificats
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

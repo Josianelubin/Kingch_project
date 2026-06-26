@@ -1,0 +1,172 @@
+{% extends 'quiz/base.html' %}
+{% block title %}KING CH - Plateforme de Quiz{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero {
+    text-align: center;
+    padding: 5rem 2rem 4rem;
+}
+
+.hero-crown {
+    font-size: 5rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.hero-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #FFD700, #FFF3A3, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: 4px;
+}
+
+.hero-sub {
+    font-size: 1.2rem;
+    color: var(--gray);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.features { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+    gap: 1.5rem;
+    margin-top: 4rem;
+}
+
+.feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,215,0,0.12);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.feature-card:hover {
+    border-color: rgba(255,215,0,0.3);
+    background: rgba(255,215,0,0.05);
+    transform: translateY(-4px);
+}
+
+.feature-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+.feature-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+}
+
+.feature-desc { color: var(--gray); font-size: 0.9rem; line-height: 1.6; }
+
+.stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 3rem 0;
+    padding: 2rem;
+    background: rgba(255,215,0,0.04);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 16px;
+}
+
+.stat-item { text-align: center; }
+.stat-num {
+    font-size: 2.2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.stat-label { color: var(--gray); font-size: 0.85rem; margin-top: 0.25rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <span class="hero-crown">👑</span>
+    <h1 class="hero-title">KING CH</h1>
+    <p class="hero-sub">
+        La plateforme de quiz ultime. Répondez aux questions du jour, gagnez des points, 
+        obtenez des certificats et grimpez dans le classement des champions!
+    </p>
+    <div class="hero-cta">
+        <a href="{% url 'register' %}" class="btn btn-gold" style="padding:1rem 2.5rem; font-size:1rem;">
+            🚀 Commencer maintenant
+        </a>
+        <a href="{% url 'login' %}" class="btn btn-outline" style="padding:1rem 2.5rem; font-size:1rem;">
+            🔐 Se connecter
+        </a>
+    </div>
+</div>
+
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="stat-num">3 pts</div>
+        <div class="stat-label">Par bonne réponse</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Questions quotidiennes</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">🏆</div>
+        <div class="stat-label">Certificats officiels</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Disponible partout</div>
+    </div>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <span class="feature-icon">❓</span>
+        <div class="feature-title">Questions du Jour</div>
+        <div class="feature-desc">Chaque jour de nouvelles questions dans de nombreuses catégories. Testez vos connaissances!</div>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">⭐</span>
+        <div class="feature-title">Système de Points</div>
+        <div class="feature-desc">Chaque bonne réponse vous rapporte 3 points. Accumulez des points pour débloquer des récompenses!</div>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">🏅</span>
+        <div class="feature-title">Certificats Officiels</div>
+        <div class="feature-desc">Recevez des certificats officiels de la part des administrateurs selon vos performances.</div>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">🏆</span>
+        <div class="feature-title">Classement Global</div>
+        <div class="feature-desc">Comparez-vous aux autres joueurs et grimpez dans le classement des champions KING CH.</div>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">👤</span>
+        <div class="feature-title">Profil Personnalisé</div>
+        <div class="feature-desc">Créez votre profil, suivez vos statistiques et partagez vos exploits avec la communauté.</div>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">💬</span>
+        <div class="feature-title">Support WhatsApp</div>
+        <div class="feature-desc">Notre équipe est disponible sur WhatsApp pour répondre à toutes vos questions.</div>
+    </div>
+</div>
+{% endblock %}

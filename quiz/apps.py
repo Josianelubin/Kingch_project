@@ -3,8 +3,8 @@ from django.apps import AppConfig
 
 class QuizConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'quiz'
-    verbose_name = 'KING CH Quiz'
+    name               = 'quiz'
+    verbose_name       = 'KING CH Quiz'
 
     def ready(self):
-        import quiz.signals
+        import quiz.signals  # noqa: F401 — connect signal handlers

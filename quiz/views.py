@@ -231,6 +231,12 @@ def createur_view(request):
 
 
 @login_required
+def certificats_view(request):
+    certificates = Certificate.objects.filter(user=request.user).order_by('-issued_at')
+    return render(request, 'quiz/certificats.html', {'certificates': certificates})
+
+
+@login_required
 def leaderboard_view(request):
     leaders = UserProfile.objects.filter(is_blocked=False)\
                                   .select_related('user').order_by('-total_points')[:50]

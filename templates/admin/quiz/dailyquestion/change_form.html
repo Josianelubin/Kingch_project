@@ -1,0 +1,22 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block form_top %}
+<div style="background:linear-gradient(135deg,rgba(212,160,23,.1),rgba(212,160,23,.03));
+            border:1px solid rgba(212,160,23,.28);border-radius:12px;
+            padding:1rem 1.4rem;margin-bottom:1.5rem;">
+  <div style="font-weight:700;color:#D4A017;font-size:0.9rem;margin-bottom:0.5rem;">
+    Guide : Comment ajouter une question
+  </div>
+  <ol style="color:#8892A4;font-size:0.82rem;line-height:2;margin-left:1rem;">
+    <li>Saisissez le <strong style="color:#E8E8F0;">texte de la question</strong> dans le premier champ.</li>
+    <li>Remplissez les <strong style="color:#E8E8F0;">4 reponses</strong> : Option A, Option B, Option C, Option D.</li>
+    <li>Dans <strong style="color:#E8E8F0;">Bonne reponse</strong>, selectionnez la lettre correcte (A, B, C ou D).</li>
+    <li>Choisissez la <strong style="color:#E8E8F0;">categorie</strong>, la <strong style="color:#E8E8F0;">date</strong> et les <strong style="color:#E8E8F0;">points</strong> (defaut : 3).</li>
+    <li>Cliquez sur <strong style="color:#D4A017;">Enregistrer</strong>.</li>
+  </ol>
+  <div style="margin-top:0.6rem;font-size:0.78rem;color:#8892A4;">
+    L'utilisateur verra la question le jour correspondant a la date choisie et pourra repondre une seule fois.
+  </div>
+</div>
+{% endblock %}

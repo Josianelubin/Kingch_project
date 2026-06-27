@@ -1,177 +1,307 @@
 {% extends 'quiz/base.html' %}
-{% block title %}Question - KING CH{% endblock %}
+{% block title %}{{ question.question_text|truncatechars:40 }} - KING CH{% endblock %}
 
 {% block extra_css %}
 <style>
-.quiz-container { max-width: 680px; margin: 0 auto; }
-
-.quiz-header {
-    text-align: center;
-    margin-bottom: 2rem;
+/* ─── Page layout ─────────────────────────────────────────────────── */
+.quiz-wrap {
+  max-width: 700px;
+  margin: 0 auto;
 }
 
+/* ─── Header band ─────────────────────────────────────────────────── */
+.quiz-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.6rem;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.quiz-topbar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.quiz-topbar-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+.pts-badge {
+  background: linear-gradient(135deg,rgba(212,160,23,.18),rgba(212,160,23,.06));
+  border: 1px solid rgba(212,160,23,.35);
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ─── Card ────────────────────────────────────────────────────────── */
 .quiz-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,215,0,0.2);
-    border-radius: 20px;
-    padding: 2.5rem;
-    backdrop-filter: blur(10px);
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
 }
 
-.question-num {
-    font-size: 0.8rem;
-    color: var(--gray);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.8rem;
+/* Category strip */
+.quiz-cat-strip {
+  background: linear-gradient(135deg, var(--dark3), rgba(212,160,23,.08));
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.cat-tag {
+  background: rgba(212,160,23,.12);
+  border: 1px solid rgba(212,160,23,.25);
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.question-body {
-    font-size: 1.3rem;
-    font-weight: 600;
-    line-height: 1.6;
-    margin-bottom: 2rem;
-    color: var(--white);
+/* Question text */
+.quiz-question {
+  padding: 2rem 1.8rem 1.6rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.65;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,.05);
 }
 
-.options { display: flex; flex-direction: column; gap: 0.8rem; }
-
-.option-label {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.2rem;
-    background: rgba(255,255,255,0.03);
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
+/* ─── Options ─────────────────────────────────────────────────────── */
+.options-wrap {
+  padding: 1.4rem 1.8rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.option-label:hover {
-    border-color: rgba(255,215,0,0.4);
-    background: rgba(255,215,0,0.06);
-    transform: translateX(4px);
+/* Hide native radio */
+.opt-radio { position: absolute; opacity: 0; width: 0; height: 0; }
+
+/* Each option row */
+.opt-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.025);
+  cursor: pointer;
+  transition: border-color .18s, background .18s, transform .15s;
+  user-select: none;
+}
+.opt-label:hover {
+  border-color: rgba(212,160,23,.45);
+  background: rgba(212,160,23,.06);
+  transform: translateX(3px);
 }
 
-.option-radio { display: none; }
-
-.option-radio:checked + .option-label {
-    border-color: var(--gold);
-    background: rgba(255,215,0,0.12);
-    color: var(--gold);
+/* Letter circle */
+.opt-circle {
+  min-width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(212,160,23,.3);
+  background: rgba(212,160,23,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--gold);
+  transition: all .18s;
+  flex-shrink: 0;
 }
 
-.option-letter {
-    min-width: 36px;
-    height: 36px;
-    background: rgba(255,215,0,0.1);
-    border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: var(--gold);
+.opt-text {
+  font-size: 0.97rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.45;
 }
 
-.quiz-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    padding: 0.8rem 1.2rem;
-    background: rgba(255,255,255,0.03);
-    border-radius: 10px;
+/* SELECTED state */
+.opt-radio:checked + .opt-label {
+  border-color: var(--gold);
+  background: rgba(212,160,23,.13);
+}
+.opt-radio:checked + .opt-label .opt-circle {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #0A0A10;
+}
+.opt-radio:checked + .opt-label .opt-text {
+  color: var(--gold);
+  font-weight: 700;
 }
 
-.submit-btn {
-    margin-top: 1.5rem;
-    width: 100%;
-    justify-content: center;
-    padding: 1rem;
-    font-size: 1rem;
+/* ─── Submit button ───────────────────────────────────────────────── */
+.quiz-footer {
+  padding: 0 1.8rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.btn-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 0.95rem;
+  font-size: 1rem;
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity .25s, transform .18s, box-shadow .18s;
+}
+.btn-submit.ready {
+  opacity: 1;
+  pointer-events: all;
+}
+.btn-submit.ready:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212,160,23,.3);
+}
+
+.quiz-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ─── Already answered banner ─────────────────────────────────────── */
+.already-badge {
+  background: rgba(46,204,113,.12);
+  border: 1px solid rgba(46,204,113,.3);
+  color: var(--green);
+  border-radius: 10px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .quiz-question { font-size: 1.05rem; padding: 1.5rem 1.2rem 1.2rem; }
+  .options-wrap  { padding: 1rem 1rem 1.2rem; }
+  .quiz-footer   { padding: 0 1rem 1.2rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="quiz-container">
-    <div class="quiz-header">
-        <span style="font-size:2.5rem;">❓</span>
-        <h1 style="font-size:1.4rem; font-weight:700; margin-top:0.5rem;">Question du Jour</h1>
-        <p style="color:var(--gray); font-size:0.9rem;">{{ question.date|date:"d F Y" }}</p>
+<div class="quiz-wrap">
+
+  <!-- Top bar -->
+  <div class="quiz-topbar">
+    <div>
+      <div class="quiz-topbar-title">Question du jour</div>
+      <div class="quiz-topbar-sub">{{ question.date|date:"d F Y" }} &mdash; Choisissez une seule reponse</div>
+    </div>
+    <span class="pts-badge">+ {{ question.points }} pts si correct</span>
+  </div>
+
+  <div class="quiz-card">
+
+    <!-- Category strip -->
+    <div class="quiz-cat-strip">
+      <span>{{ question.get_category_display }}</span>
+      <span class="cat-tag">{{ question.get_category_display }}</span>
     </div>
 
-    <div class="quiz-card">
-        <div class="quiz-meta">
-            <span>📂 {{ question.get_category_display }}</span>
-            <span class="badge badge-gold">⭐ {{ question.points }} points</span>
+    <!-- Question text -->
+    <div class="quiz-question">
+      {{ question.question_text }}
+    </div>
+
+    <!-- Options A B C D -->
+    <form method="post" id="quizForm">
+      {% csrf_token %}
+
+      <div class="options-wrap">
+
+        <!-- A -->
+        <input type="radio" name="answer" value="A" id="opt_A" class="opt-radio">
+        <label for="opt_A" class="opt-label">
+          <span class="opt-circle">A</span>
+          <span class="opt-text">{{ question.option_a }}</span>
+        </label>
+
+        <!-- B -->
+        <input type="radio" name="answer" value="B" id="opt_B" class="opt-radio">
+        <label for="opt_B" class="opt-label">
+          <span class="opt-circle">B</span>
+          <span class="opt-text">{{ question.option_b }}</span>
+        </label>
+
+        <!-- C -->
+        <input type="radio" name="answer" value="C" id="opt_C" class="opt-radio">
+        <label for="opt_C" class="opt-label">
+          <span class="opt-circle">C</span>
+          <span class="opt-text">{{ question.option_c }}</span>
+        </label>
+
+        <!-- D -->
+        <input type="radio" name="answer" value="D" id="opt_D" class="opt-radio">
+        <label for="opt_D" class="opt-label">
+          <span class="opt-circle">D</span>
+          <span class="opt-text">{{ question.option_d }}</span>
+        </label>
+
+      </div>
+
+      <div class="quiz-footer">
+        <button type="submit" class="btn btn-gold btn-submit" id="submitBtn">
+          Valider ma reponse
+        </button>
+        <div class="quiz-hint" id="quizHint">
+          Selectionnez une reponse pour continuer
         </div>
+      </div>
 
-        <div class="question-num">Question :</div>
-        <div class="question-body">{{ question.question_text }}</div>
+    </form>
+  </div>
 
-        <form method="post">
-            {% csrf_token %}
-            <div class="options">
-                {% for letter, text in 'A,B,C,D'|cut:','|make_list|zip %}
-                {% endfor %}
+  <div style="text-align:center; margin-top:1.4rem;">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline">Retour au tableau de bord</a>
+  </div>
 
-                <input type="radio" name="answer" value="A" id="opt_a" class="option-radio">
-                <label for="opt_a" class="option-label">
-                    <span class="option-letter">A</span>
-                    {{ question.option_a }}
-                </label>
-
-                <input type="radio" name="answer" value="B" id="opt_b" class="option-radio">
-                <label for="opt_b" class="option-label">
-                    <span class="option-letter">B</span>
-                    {{ question.option_b }}
-                </label>
-
-                <input type="radio" name="answer" value="C" id="opt_c" class="option-radio">
-                <label for="opt_c" class="option-label">
-                    <span class="option-letter">C</span>
-                    {{ question.option_c }}
-                </label>
-
-                <input type="radio" name="answer" value="D" id="opt_d" class="option-radio">
-                <label for="opt_d" class="option-label">
-                    <span class="option-letter">D</span>
-                    {{ question.option_d }}
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-gold submit-btn">
-                ✅ Valider ma réponse
-            </button>
-        </form>
-    </div>
-
-    <div style="text-align:center; margin-top:1.5rem;">
-        <a href="{% url 'dashboard' %}" class="btn btn-outline">← Retour au dashboard</a>
-    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Highlight selected option visually
-document.querySelectorAll('.option-radio').forEach(radio => {
-    radio.addEventListener('change', () => {
-        document.querySelectorAll('.option-label').forEach(l => {
-            l.style.borderColor = '';
-            l.style.background = '';
-        });
-        if (radio.checked) {
-            const label = radio.nextElementSibling;
-            label.style.borderColor = 'var(--gold)';
-            label.style.background = 'rgba(255,215,0,0.12)';
-        }
+(function () {
+  var radios = document.querySelectorAll('.opt-radio');
+  var btn    = document.getElementById('submitBtn');
+  var hint   = document.getElementById('quizHint');
+
+  radios.forEach(function (r) {
+    r.addEventListener('change', function () {
+      // Unlock submit button
+      btn.classList.add('ready');
+      hint.textContent = 'Cliquez sur "Valider ma reponse" pour confirmer';
+      hint.style.color = 'var(--gold)';
     });
-});
+  });
+
+  // Prevent double-submit
+  document.getElementById('quizForm').addEventListener('submit', function () {
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours...';
+  });
+})();
 </script>
 {% endblock %}

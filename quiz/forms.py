@@ -9,8 +9,8 @@ class CustomLoginForm(AuthenticationForm):
         label="Nom d'utilisateur",
         widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Votre nom d\'utilisateur',
-            'autocomplete': 'username'
+            'placeholder': "Votre nom d'utilisateur",
+            'autocomplete': 'username',
         })
     )
     password = forms.CharField(
@@ -18,20 +18,18 @@ class CustomLoginForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-input',
             'placeholder': '••••••••',
-            'autocomplete': 'current-password'
+            'autocomplete': 'current-password',
         })
     )
 
 
 class CustomRegisterForm(forms.ModelForm):
     first_name = forms.CharField(
-        label="Prénom",
-        max_length=50,
-        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Votre prénom'})
+        label="Prenom", max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Votre prenom'})
     )
     last_name = forms.CharField(
-        label="Nom",
-        max_length=50,
+        label="Nom", max_length=50,
         widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Votre nom'})
     )
     email = forms.EmailField(
@@ -48,7 +46,7 @@ class CustomRegisterForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
+        model  = User
         fields = ['username', 'first_name', 'last_name', 'email']
         labels = {'username': "Nom d'utilisateur"}
         widgets = {
@@ -58,7 +56,7 @@ class CustomRegisterForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Cet email est déjà utilisé.")
+            raise forms.ValidationError("Cet email est deja utilise.")
         return email
 
     def clean(self):
@@ -70,6 +68,7 @@ class CustomRegisterForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
+        # Use set_password so the password is properly hashed
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
         if commit:
@@ -79,34 +78,34 @@ class CustomRegisterForm(forms.ModelForm):
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
-        model = UserProfile
+        model  = UserProfile
         fields = ['avatar', 'bio', 'phone', 'whatsapp']
         labels = {
-            'avatar': "Photo de profil",
-            'bio': "Biographie",
-            'phone': "Téléphone",
+            'avatar':   "Photo de profil",
+            'bio':      "Biographie",
+            'phone':    "Telephone",
             'whatsapp': "WhatsApp",
         }
         widgets = {
-            'bio': forms.Textarea(attrs={'class': 'form-input', 'rows': 3, 'placeholder': 'Parlez de vous...'}),
-            'phone': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+33 6 12 34 56 78'}),
-            'whatsapp': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+33 6 12 34 56 78'}),
+            'bio':      forms.Textarea(attrs={'class': 'form-input', 'rows': 3, 'placeholder': 'Parlez de vous...'}),
+            'phone':    forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+509 ...'}),
+            'whatsapp': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+509 ...'}),
         }
 
 
 class UserSettingsForm(forms.ModelForm):
     class Meta:
-        model = User
+        model  = User
         fields = ['first_name', 'last_name', 'email']
         labels = {
-            'first_name': 'Prénom',
-            'last_name': 'Nom',
-            'email': 'Email',
+            'first_name': 'Prenom',
+            'last_name':  'Nom',
+            'email':      'Email',
         }
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'email': forms.EmailInput(attrs={'class': 'form-input'}),
+            'last_name':  forms.TextInput(attrs={'class': 'form-input'}),
+            'email':      forms.EmailInput(attrs={'class': 'form-input'}),
         }
 
 

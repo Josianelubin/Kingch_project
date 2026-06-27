@@ -3,11 +3,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-admin.site.site_header = "KING CH - Administration"
-admin.site.site_title = "KING CH Admin"
-admin.site.index_title = "Tableau de bord KING CH"
+# NOTE: do NOT set admin.site.site_header here — Jazzmin handles it via settings.py
+# Setting it here would override Jazzmin settings.
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('quiz.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Serve media files in development (DEBUG=True)
+# In production (Render), use a CDN or cloud storage
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # Still serve media in production for simplicity (Render ephemeral disk)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

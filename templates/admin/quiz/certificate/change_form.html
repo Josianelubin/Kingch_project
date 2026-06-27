@@ -1,0 +1,26 @@
+{% extends "admin/change_form.html" %}
+
+{% block form_top %}
+<div style="background:linear-gradient(135deg,rgba(212,160,23,.1),rgba(212,160,23,.03));
+            border:1px solid rgba(212,160,23,.3);border-radius:14px;
+            padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+  <div style="font-weight:700;color:#D4A017;font-size:0.95rem;margin-bottom:0.8rem;">
+    Comment envoyer un certificat avec photo a un utilisateur
+  </div>
+  <ol style="color:#8892A4;font-size:0.85rem;line-height:2.2;margin-left:1.2rem;">
+    <li>Selectionnez l'<strong style="color:#E8E8F0;">Utilisateur</strong> destinataire dans le premier champ.</li>
+    <li>Remplissez le <strong style="color:#E8E8F0;">Titre</strong> du certificat (ex: Certificat d'excellence).</li>
+    <li>Ajoutez une <strong style="color:#E8E8F0;">Description / Message</strong> personnalise (optionnel).</li>
+    <li>Dans <strong style="color:#E8E8F0;">Image du certificat</strong>, cliquez sur <em>Choisir un fichier</em>
+        et selectionnez la photo depuis votre stockage local (JPG, PNG, WEBP, GIF).</li>
+    <li>Cliquez sur <strong style="color:#D4A017;">Enregistrer</strong>.
+        L'image sera stockee sur le serveur et l'utilisateur recevra une notification automatique.</li>
+  </ol>
+  <div style="margin-top:0.8rem;padding:0.7rem 1rem;background:rgba(46,204,113,.08);
+              border:1px solid rgba(46,204,113,.2);border-radius:8px;
+              color:#2ecc71;font-size:0.82rem;">
+    L'utilisateur pourra voir et telecharger son certificat depuis son profil et
+    la page "Mes certificats".
+  </div>
+</div>
+{% endblock %}

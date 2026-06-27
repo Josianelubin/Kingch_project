@@ -12,6 +12,7 @@ urlpatterns = [
     path('profile/',                       views.profile_view,      name='profile'),
     path('profile/<str:username>/',        views.profile_view,      name='profile_detail'),
     path('profile/edit/',                  views.edit_profile_view, name='edit_profile'),
+    path('certificats/',                   views.certificats_view,  name='certificats'),
     path('settings/',                      views.settings_view,     name='settings'),
     path('notifications/',                 views.notifications_view,name='notifications'),
     path('leaderboard/',                   views.leaderboard_view,  name='leaderboard'),

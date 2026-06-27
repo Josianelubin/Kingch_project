@@ -1,288 +1,449 @@
 {% extends 'quiz/base.html' %}
-{% block title %}Dashboard - KING CH{% endblock %}
+{% block title %}Tableau de bord - KING CH{% endblock %}
 
 {% block extra_css %}
 <style>
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+/* ─── Stats strip ─────────────────────────────────────────────────── */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+@media (max-width:700px) { .stats-strip { grid-template-columns: repeat(2,1fr); } }
 
-.stat-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,215,0,0.15);
-    border-radius: 14px;
-    padding: 1.5rem;
-    text-align: center;
+.stat-box {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+.stat-box-val {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.stat-box-lbl { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ─── Two-column layout ──────────────────────────────────────────── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width:900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+/* ─── Section title ──────────────────────────────────────────────── */
+.sec-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.sec-title {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.sec-title::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 16px;
+  background: var(--gold);
+  border-radius: 2px;
 }
 
-.stat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.stat-value { font-size: 2rem; font-weight: 900; color: var(--gold); }
-.stat-label { color: var(--gray); font-size: 0.85rem; margin-top: 0.25rem; }
+/* ─── Question card ─────────────────────────────────────────────── */
+.q-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  transition: border-color .18s;
+}
+.q-card:hover { border-color: rgba(212,160,23,.4); }
 
-.question-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,215,0,0.12);
-    border-radius: 14px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    transition: all 0.2s;
+.q-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.3rem 0.9rem;
 }
 
-.question-card:hover {
-    border-color: rgba(255,215,0,0.3);
-    background: rgba(255,215,0,0.03);
+.q-text {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  flex: 1;
+}
+.q-cat {
+  background: rgba(212,160,23,.1);
+  border: 1px solid rgba(212,160,23,.22);
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
-.question-text { font-weight: 500; color: var(--white); flex: 1; }
-.question-meta { color: var(--gray); font-size: 0.8rem; margin-top: 0.3rem; }
-
-.answered-card {
-    opacity: 0.7;
-    border-color: rgba(46,204,113,0.2) !important;
+/* Mini preview of options */
+.q-opts-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  padding: 0 1.3rem 0.9rem;
+}
+.q-opt-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+}
+.q-opt-letter {
+  font-weight: 800;
+  color: var(--gold);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  min-width: 14px;
+}
+.q-opt-txt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.leaderboard-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid transparent;
-    transition: all 0.2s;
+/* Footer of q-card */
+.q-card-foot {
+  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 0.7rem 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,.015);
+}
+.q-pts-lbl { font-size: 0.78rem; color: var(--muted); }
+.q-pts-val { color: var(--gold); font-weight: 700; }
+
+.btn-answer {
+  padding: 0.45rem 1.1rem;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  font-weight: 700;
 }
 
-.leaderboard-item:hover { background: rgba(255,255,255,0.05); }
-.leaderboard-item.gold-rank { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.05); }
-.leaderboard-item.silver-rank { border-color: rgba(192,192,192,0.2); background: rgba(192,192,192,0.03); }
-.leaderboard-item.bronze-rank { border-color: rgba(205,127,50,0.2); background: rgba(205,127,50,0.03); }
-
-.rank-num { font-weight: 900; font-size: 1rem; min-width: 30px; color: var(--gray); }
-.rank-name { flex: 1; font-weight: 600; }
-.rank-pts { font-weight: 700; color: var(--gold); }
-
-.cert-card {
-    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05));
-    border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 12px;
-    padding: 1.2rem;
-    margin-bottom: 0.8rem;
+/* Done card */
+.q-card-done {
+  opacity: 0.55;
+  border-color: rgba(46,204,113,.2) !important;
+}
+.q-card-done .q-card-foot {
+  background: rgba(46,204,113,.04);
 }
 
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+  display: block;
+  opacity: .5;
+}
+.empty-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; }
+.empty-sub   { font-size: 0.85rem; }
+
+/* ─── Notification items ─────────────────────────────────────────── */
 .notif-item {
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
-    background: rgba(52,152,219,0.08);
-    border: 1px solid rgba(52,152,219,0.15);
-    font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(52,152,219,.07);
+  border: 1px solid rgba(52,152,219,.18);
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
 }
+.notif-time { color: var(--muted); font-size: 0.75rem; margin-top: 0.25rem; }
 
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+/* ─── Leaderboard ────────────────────────────────────────────────── */
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  margin-bottom: 0.4rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid transparent;
+  transition: background .15s;
 }
+.lb-row:hover { background: rgba(255,255,255,.05); }
+.lb-row.me-row { border-color: rgba(212,160,23,.3); background: rgba(212,160,23,.06); }
 
-.welcome-banner {
-    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(123,47,190,0.1));
-    border: 1px solid rgba(255,215,0,0.2);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+.lb-rank {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
+.lb-rank.r1 { color: var(--gold); font-size: 1rem; }
+.lb-rank.r2 { color: #C0C0C0; }
+.lb-rank.r3 { color: #CD7F32; }
 
-.welcome-text h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--white);
+.lb-name { flex: 1; font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.lb-pts  { font-size: 0.82rem; font-weight: 700; color: var(--gold); white-space: nowrap; }
+
+/* ─── Quick-links ────────────────────────────────────────────────── */
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all .18s;
+  margin-bottom: 0.5rem;
 }
+.quick-link:hover { border-color: rgba(212,160,23,.35); color: var(--gold); background: rgba(212,160,23,.05); }
 
-.welcome-text p { color: var(--gray); font-size: 0.9rem; margin-top: 0.3rem; }
-
-.main-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
+/* ─── Cert card ──────────────────────────────────────────────────── */
+.cert-item {
+  background: linear-gradient(135deg, rgba(212,160,23,.1), rgba(212,160,23,.03));
+  border: 1px solid rgba(212,160,23,.28);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.7rem;
 }
-
-@media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+.cert-name { font-weight: 700; color: var(--gold); font-size: 0.92rem; }
+.cert-meta { color: var(--muted); font-size: 0.75rem; margin-top: 0.25rem; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="welcome-banner">
-    <div class="welcome-text">
-        <h2>👑 Bonjour, {{ user.first_name|default:user.username }}!</h2>
-        <p>Continuez à progresser — chaque bonne réponse vous rapproche du sommet.</p>
-    </div>
-    <div style="text-align:right;">
-        <div class="points-big">{{ profile.total_points }}</div>
-        <div style="color:var(--gray); font-size:0.85rem;">points totaux</div>
-    </div>
+
+<!-- ── Stats strip ── -->
+<div class="stats-strip">
+  <div class="stat-box">
+    <div class="stat-box-val">{{ profile.total_points }}</div>
+    <div class="stat-box-lbl">Points totaux</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-val">{{ points_today }}</div>
+    <div class="stat-box-lbl">Points aujourd'hui</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-val">{{ pending_questions.count }}</div>
+    <div class="stat-box-lbl">Questions restantes</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-box-val">{{ certificates.count }}</div>
+    <div class="stat-box-lbl">Certificats</div>
+  </div>
 </div>
 
-<!-- Stats rapides -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-value">{{ profile.total_points }}</div>
-        <div class="stat-label">Points totaux</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon">📅</div>
-        <div class="stat-value">{{ points_today }}</div>
-        <div class="stat-label">Points aujourd'hui</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon">❓</div>
-        <div class="stat-value">{{ pending_questions.count }}</div>
-        <div class="stat-label">Questions restantes</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon">🏆</div>
-        <div class="stat-value">{{ certificates.count }}</div>
-        <div class="stat-label">Certificats</div>
-    </div>
-</div>
+<div class="dash-grid">
 
-<div class="main-grid">
-    <!-- LEFT: Questions -->
-    <div>
-        <!-- Notifications -->
-        {% if notifications %}
-        <div class="card" style="margin-bottom:1.5rem;">
-            <div class="section-header">
-                <h3 class="section-title"><span class="icon">🔔</span> Nouvelles alertes</h3>
-                <a href="{% url 'notifications' %}" style="color:var(--gold); font-size:0.85rem;">Tout voir</a>
+  <!-- ══ LEFT column ══ -->
+  <div>
+
+    <!-- Notifications -->
+    {% if notifications %}
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="sec-hd">
+        <div class="sec-title">Nouvelles alertes</div>
+        <a href="{% url 'notifications' %}" style="font-size:0.8rem; color:var(--gold);">Tout voir</a>
+      </div>
+      {% for n in notifications %}
+      <div class="notif-item">
+        {{ n.message }}
+        <div class="notif-time">{{ n.created_at|date:"d/m/Y H:i" }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Questions du jour -->
+    <div class="card">
+      <div class="sec-hd">
+        <div class="sec-title">Questions du {{ today|date:"d/m/Y" }}</div>
+        <span class="badge badge-gold">3 pts par reponse</span>
+      </div>
+
+      {% if pending_questions %}
+        <p style="color:var(--muted); font-size:0.83rem; margin-bottom:1rem;">
+          {{ pending_questions.count }} question(s) en attente de reponse.
+          Choisissez une seule reponse par question (A, B, C ou D).
+        </p>
+
+        {% for q in pending_questions %}
+        <div class="q-card">
+          <div class="q-card-head">
+            <div class="q-text">{{ q.question_text }}</div>
+            <span class="q-cat">{{ q.get_category_display }}</span>
+          </div>
+
+          <!-- Mini preview of the 4 options -->
+          <div class="q-opts-preview">
+            <div class="q-opt-mini">
+              <span class="q-opt-letter">A</span>
+              <span class="q-opt-txt">{{ q.option_a }}</span>
             </div>
-            {% for notif in notifications %}
-            <div class="notif-item">{{ notif.message }}</div>
-            {% endfor %}
+            <div class="q-opt-mini">
+              <span class="q-opt-letter">B</span>
+              <span class="q-opt-txt">{{ q.option_b }}</span>
+            </div>
+            <div class="q-opt-mini">
+              <span class="q-opt-letter">C</span>
+              <span class="q-opt-txt">{{ q.option_c }}</span>
+            </div>
+            <div class="q-opt-mini">
+              <span class="q-opt-letter">D</span>
+              <span class="q-opt-txt">{{ q.option_d }}</span>
+            </div>
+          </div>
+
+          <div class="q-card-foot">
+            <span class="q-pts-lbl">Valeur : <span class="q-pts-val">{{ q.points }} pts</span></span>
+            <a href="{% url 'quiz' q.id %}" class="btn btn-gold btn-answer">Repondre</a>
+          </div>
         </div>
+        {% endfor %}
+
+      {% else %}
+        <div class="empty-state">
+          <span class="empty-icon">&#10003;</span>
+          <div class="empty-title">Toutes les questions repondues !</div>
+          <div class="empty-sub">Revenez demain pour de nouvelles questions.</div>
+        </div>
+      {% endif %}
+
+      <!-- Already answered today -->
+      {% if answered_today %}
+        <div class="divider" style="margin-top:1rem;"></div>
+        <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:0.8rem;">
+          Deja repondues aujourd'hui
+        </div>
+        {% for q in answered_today %}
+        <div class="q-card q-card-done">
+          <div class="q-card-head">
+            <div class="q-text" style="color:var(--muted);">{{ q.question_text|truncatechars:90 }}</div>
+          </div>
+          <div class="q-card-foot">
+            <span class="q-pts-lbl">Repondue</span>
+            <span class="badge badge-green">Repondu</span>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Certificates -->
+    {% if certificates %}
+    <div class="card" style="margin-top:1.5rem;">
+      <div class="sec-title" style="margin-bottom:1rem;">Mes certificats</div>
+      {% for c in certificates %}
+      <div class="cert-item">
+        {% if c.certificate_image %}
+        <a href="{{ c.certificate_image.url }}" target="_blank">
+          <img src="{{ c.certificate_image.url }}" alt="Certificat {{ c.title }}"
+               style="width:100%; max-height:160px; object-fit:cover; border-radius:10px;
+                      border:1px solid rgba(212,160,23,.3); margin-bottom:0.8rem; display:block;">
+        </a>
         {% endif %}
-
-        <!-- Questions du jour -->
-        <div class="card">
-            <div class="section-header">
-                <h3 class="section-title"><span class="icon">📅</span> Questions du {{ today|date:"d/m/Y" }}</h3>
-                <span class="badge badge-gold">+3 pts chacune</span>
-            </div>
-
-            {% if pending_questions %}
-                <p style="color:var(--gray); font-size:0.9rem; margin-bottom:1rem;">
-                    {{ pending_questions.count }} question(s) en attente de réponse
-                </p>
-                {% for question in pending_questions %}
-                <div class="question-card">
-                    <div>
-                        <div class="question-text">{{ question.question_text|truncatechars:100 }}</div>
-                        <div class="question-meta">
-                            📂 {{ question.get_category_display }} · ⭐ {{ question.points }} pts
-                        </div>
-                    </div>
-                    <a href="{% url 'quiz' question.id %}" class="btn btn-gold" style="white-space:nowrap;">
-                        Répondre →
-                    </a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div style="text-align:center; padding:2rem; color:var(--gray);">
-                    <div style="font-size:3rem; margin-bottom:1rem;">✅</div>
-                    <p style="font-size:1rem; font-weight:600;">Toutes les questions répondues!</p>
-                    <p style="font-size:0.85rem; margin-top:0.5rem;">Revenez demain pour de nouvelles questions.</p>
-                </div>
-            {% endif %}
-
-            {% if answered_today %}
-            <hr class="divider">
-            <h4 style="color:var(--gray); font-size:0.85rem; margin-bottom:0.8rem; text-transform:uppercase; letter-spacing:0.5px;">Déjà répondues aujourd'hui</h4>
-            {% for question in answered_today %}
-            {% with answer=question.user_answers.filter %}
-            <div class="question-card answered-card">
-                <div>
-                    <div class="question-text" style="color:var(--gray);">{{ question.question_text|truncatechars:80 }}</div>
-                </div>
-                <span class="badge badge-green">✓ Répondu</span>
-            </div>
-            {% endwith %}
-            {% endfor %}
-            {% endif %}
-        </div>
-
-        <!-- Certificats -->
-        {% if certificates %}
-        <div class="card" style="margin-top:1.5rem;">
-            <h3 class="section-title"><span class="icon">🏆</span> Mes certificats</h3>
-            {% for cert in certificates %}
-            <div class="cert-card">
-                <div style="font-weight:700; color:var(--gold);">🎖 {{ cert.title }}</div>
-                {% if cert.description %}
-                <div style="color:var(--gray); font-size:0.85rem; margin-top:0.3rem;">{{ cert.description }}</div>
-                {% endif %}
-                <div style="color:var(--gray); font-size:0.8rem; margin-top:0.5rem;">
-                    Émis le {{ cert.issued_at|date:"d/m/Y" }} · {{ cert.points_required }} pts requis
-                </div>
-                {% if cert.certificate_file %}
-                <a href="{{ cert.certificate_file.url }}" class="btn btn-gold" style="margin-top:0.8rem; padding:0.4rem 1rem; font-size:0.85rem;" target="_blank">
-                    📥 Télécharger
-                </a>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
+        <div class="cert-name">{{ c.title }}</div>
+        {% if c.description %}
+        <div style="color:var(--muted); font-size:0.8rem; margin-top:0.3rem; line-height:1.5;">{{ c.description }}</div>
         {% endif %}
+        <div class="cert-meta">{{ c.issued_at|date:"d/m/Y" }} &mdash; {{ c.points_required }} pts requis</div>
+        {% if c.certificate_image %}
+        <a href="{{ c.certificate_image.url }}" target="_blank" download
+           class="btn btn-gold" style="margin-top:0.7rem; padding:0.35rem 0.9rem; font-size:0.78rem;">
+          Telecharger le certificat
+        </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ══ RIGHT column ══ -->
+  <div>
+
+    <!-- Leaderboard -->
+    <div class="card" style="margin-bottom:1.2rem;">
+      <div class="sec-hd">
+        <div class="sec-title">Classement</div>
+        <a href="{% url 'leaderboard' %}" style="font-size:0.78rem; color:var(--gold);">Tout voir</a>
+      </div>
+      {% for leader in leaderboard %}
+      <div class="lb-row {% if leader.user == user %}me-row{% endif %}">
+        <div class="lb-rank {% if forloop.counter == 1 %}r1{% elif forloop.counter == 2 %}r2{% elif forloop.counter == 3 %}r3{% endif %}">
+          {% if forloop.counter <= 3 %}&#9733;{% else %}{{ forloop.counter }}{% endif %}
+        </div>
+        <div class="lb-name">
+          <a href="{% url 'profile_detail' leader.user.username %}" style="color:var(--text); text-decoration:none;">
+            {{ leader.user.first_name|default:leader.user.username }}
+          </a>
+          {% if leader.user == user %}
+          <span class="badge badge-gold" style="font-size:0.6rem; margin-left:0.3rem;">MOI</span>
+          {% endif %}
+        </div>
+        <div class="lb-pts">{{ leader.total_points }} pts</div>
+      </div>
+      {% empty %}
+      <div style="text-align:center; color:var(--muted); font-size:0.85rem; padding:1rem;">
+        Aucun joueur encore
+      </div>
+      {% endfor %}
     </div>
 
-    <!-- RIGHT: Leaderboard -->
-    <div>
-        <div class="card">
-            <div class="section-header">
-                <h3 class="section-title"><span class="icon">👑</span> Top Joueurs</h3>
-                <a href="{% url 'leaderboard' %}" style="color:var(--gold); font-size:0.85rem;">Tout voir</a>
-            </div>
-
-            {% for leader in leaderboard %}
-            <div class="leaderboard-item {% if forloop.counter == 1 %}gold-rank{% elif forloop.counter == 2 %}silver-rank{% elif forloop.counter == 3 %}bronze-rank{% endif %}">
-                <div class="rank-num">
-                    {% if forloop.counter == 1 %}👑
-                    {% elif forloop.counter == 2 %}🥈
-                    {% elif forloop.counter == 3 %}🥉
-                    {% else %}{{ forloop.counter }}{% endif %}
-                </div>
-                <div class="rank-name">
-                    <a href="{% url 'profile_detail' leader.user.username %}" style="color:var(--white); text-decoration:none;">
-                        {{ leader.user.first_name|default:leader.user.username }}
-                    </a>
-                    {% if leader.user == user %}
-                    <span class="badge badge-gold" style="margin-left:0.3rem; font-size:0.65rem;">MOI</span>
-                    {% endif %}
-                </div>
-                <div class="rank-pts">{{ leader.total_points }} ⭐</div>
-            </div>
-            {% empty %}
-            <div style="text-align:center; color:var(--gray); padding:1rem;">Aucun joueur encore</div>
-            {% endfor %}
-        </div>
-
-        <!-- Quick Links -->
-        <div class="card" style="margin-top:1.5rem;">
-            <h3 class="section-title"><span class="icon">🔗</span> Actions rapides</h3>
-            <div style="display:flex; flex-direction:column; gap:0.7rem;">
-                <a href="{% url 'profile' %}" class="btn btn-outline" style="justify-content:center;">👤 Mon profil</a>
-                <a href="{% url 'edit_profile' %}" class="btn btn-outline" style="justify-content:center;">✏️ Modifier profil</a>
-                <a href="{% url 'notifications' %}" class="btn btn-outline" style="justify-content:center;">🔔 Notifications</a>
-                <a href="{% url 'settings' %}" class="btn btn-outline" style="justify-content:center;">⚙️ Paramètres</a>
-            </div>
-        </div>
+    <!-- Quick links -->
+    <div class="card">
+      <div class="sec-title" style="margin-bottom:0.8rem;">Acces rapide</div>
+      <a href="{% url 'profile' %}" class="quick-link">Mon profil</a>
+      <a href="{% url 'certificats' %}" class="quick-link">Mes certificats</a>
+      <a href="{% url 'edit_profile' %}" class="quick-link">Modifier le profil</a>
+      <a href="{% url 'notifications' %}" class="quick-link">Mes notifications</a>
+      <a href="{% url 'settings' %}" class="quick-link">Parametres du compte</a>
+      {% if user.is_staff %}
+      <a href="/admin/" class="quick-link" style="color:var(--gold); border-color:rgba(212,160,23,.3);">
+        Panneau d'administration
+      </a>
+      {% endif %}
     </div>
+
+  </div>
+
 </div>
 {% endblock %}

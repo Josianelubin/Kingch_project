@@ -1,119 +1,298 @@
 {% extends 'quiz/base.html' %}
-{% block title %}Résultat - KING CH{% endblock %}
+{% block title %}Resultat - KING CH{% endblock %}
 
 {% block extra_css %}
 <style>
-.result-container { max-width: 580px; margin: 3rem auto; text-align: center; }
+.result-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ─── Big result card ─────────────────────────────────────────────── */
+.result-card {
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+.result-card.correct {
+  background: linear-gradient(135deg, rgba(46,204,113,.1), rgba(46,204,113,.03));
+  border: 2px solid rgba(46,204,113,.35);
+}
+.result-card.wrong {
+  background: linear-gradient(135deg, rgba(231,76,60,.1), rgba(231,76,60,.03));
+  border: 2px solid rgba(231,76,60,.35);
+}
 
 .result-icon {
-    font-size: 6rem;
-    display: block;
-    margin-bottom: 1rem;
-    animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+  display: block;
 }
 
-@keyframes pop {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+.result-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+.result-title.correct { color: var(--green); }
+.result-title.wrong   { color: var(--red);   }
+
+.result-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.4rem; }
+
+.pts-display {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.pts-display.correct { color: var(--green); }
+.pts-display.wrong   { color: var(--red);   }
+.pts-label { color: var(--muted); font-size: 0.82rem; }
+
+/* ─── Answer review card ──────────────────────────────────────────── */
+.review-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1.4rem;
+}
+.review-title {
+  background: var(--dark3);
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 1.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gold);
+}
+.review-body { padding: 1.2rem 1.4rem; }
+
+.review-question {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
-.result-card {
-    background: rgba(255,255,255,0.04);
-    border-radius: 20px;
-    padding: 3rem 2rem;
-    margin-bottom: 1.5rem;
+/* Option rows in review */
+.rev-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.rev-opt.user-correct {
+  background: rgba(46,204,113,.12);
+  border-color: rgba(46,204,113,.3);
+  color: var(--green);
+}
+.rev-opt.user-wrong {
+  background: rgba(231,76,60,.1);
+  border-color: rgba(231,76,60,.25);
+  color: var(--red);
+}
+.rev-opt.correct-ans {
+  background: rgba(46,204,113,.08);
+  border-color: rgba(46,204,113,.2);
+  color: var(--green);
+}
+.rev-opt.neutral {
+  background: rgba(255,255,255,.025);
+  color: var(--muted);
 }
 
-.result-card.correct {
-    border: 2px solid rgba(46,204,113,0.4);
-    background: rgba(46,204,113,0.06);
+.rev-circle {
+  min-width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  flex-shrink: 0;
 }
+.rev-opt.user-correct .rev-circle,
+.rev-opt.correct-ans  .rev-circle { background: var(--green); color: #0A0A10; }
+.rev-opt.user-wrong   .rev-circle { background: var(--red);   color: white; }
+.rev-opt.neutral      .rev-circle { background: rgba(255,255,255,.08); color: var(--muted); }
 
-.result-card.wrong {
-    border: 2px solid rgba(231,76,60,0.4);
-    background: rgba(231,76,60,0.06);
+.rev-indicator {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  white-space: nowrap;
 }
+.rev-opt.user-correct .rev-indicator { background: rgba(46,204,113,.2); color: var(--green); }
+.rev-opt.user-wrong   .rev-indicator { background: rgba(231,76,60,.2);  color: var(--red);   }
+.rev-opt.correct-ans  .rev-indicator { background: rgba(46,204,113,.2); color: var(--green); }
 
-.result-title { font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem; }
-.result-title.correct-text { color: #2ecc71; }
-.result-title.wrong-text { color: #e74c3c; }
-
-.points-gained {
-    font-size: 3.5rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--gold), #FFA500);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 1rem 0;
+/* ─── CTA buttons ─────────────────────────────────────────────────── */
+.result-cta {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
 }
-
-.answer-review {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 1.2rem;
-    margin: 1.5rem 0;
-    text-align: left;
-}
-
-.answer-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    font-size: 0.9rem;
-}
-
-.answer-row:last-child { border-bottom: none; }
+.result-cta .btn { flex: 1; justify-content: center; min-width: 140px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="result-container">
-    {% if answer.is_correct %}
-    <span class="result-icon">🏆</span>
-    <div class="result-card correct">
-        <div class="result-title correct-text">Bonne réponse!</div>
-        <p style="color:var(--gray);">Félicitations, vous avez répondu correctement!</p>
-        <div class="points-gained">+{{ answer.points_earned }}</div>
-        <div style="color:var(--gray); font-size:0.9rem;">points ajoutés à votre compte</div>
-    </div>
-    {% else %}
-    <span class="result-icon">😔</span>
-    <div class="result-card wrong">
-        <div class="result-title wrong-text">Mauvaise réponse</div>
-        <p style="color:var(--gray);">Ne vous découragez pas, continuez à apprendre!</p>
-        <div class="points-gained" style="background: linear-gradient(135deg, #e74c3c, #c0392b); -webkit-background-clip: text; background-clip: text;">+0</div>
-        <div style="color:var(--gray); font-size:0.9rem;">points cette fois-ci</div>
-    </div>
-    {% endif %}
+<div class="result-wrap">
 
-    <div class="answer-review">
-        <div class="answer-row">
-            <span style="color:var(--gray);">Question :</span>
-            <span style="max-width:300px; text-align:right;">{{ question.question_text|truncatechars:60 }}</span>
-        </div>
-        <div class="answer-row">
-            <span style="color:var(--gray);">Votre réponse :</span>
-            <span style="color:{% if answer.is_correct %}#2ecc71{% else %}#e74c3c{% endif %}; font-weight:700;">
-                ({{ answer.selected_answer }}) {% if answer.selected_answer == 'A' %}{{ question.option_a }}{% elif answer.selected_answer == 'B' %}{{ question.option_b }}{% elif answer.selected_answer == 'C' %}{{ question.option_c }}{% else %}{{ question.option_d }}{% endif %}
-            </span>
-        </div>
-        {% if not answer.is_correct %}
-        <div class="answer-row">
-            <span style="color:var(--gray);">Bonne réponse :</span>
-            <span style="color:#2ecc71; font-weight:700;">
-                ({{ question.correct_answer }}) {% if question.correct_answer == 'A' %}{{ question.option_a }}{% elif question.correct_answer == 'B' %}{{ question.option_b }}{% elif question.correct_answer == 'C' %}{{ question.option_c }}{% else %}{{ question.option_d }}{% endif %}
-            </span>
-        </div>
-        {% endif %}
-    </div>
+  <!-- ── Big result card ── -->
+  {% if answer.is_correct %}
+  <div class="result-card correct">
+    <span class="result-icon">&#10003;</span>
+    <div class="result-title correct">Bonne reponse !</div>
+    <div class="result-sub">Felicitations, vous avez repondu correctement.</div>
+    <div class="pts-display correct">+{{ answer.points_earned }}</div>
+    <div class="pts-label">points ajoutes a votre compte</div>
+  </div>
+  {% else %}
+  <div class="result-card wrong">
+    <span class="result-icon">&#10007;</span>
+    <div class="result-title wrong">Mauvaise reponse</div>
+    <div class="result-sub">Ne vous decouragez pas, continuez a apprendre !</div>
+    <div class="pts-display wrong">+0</div>
+    <div class="pts-label">points cette fois-ci</div>
+  </div>
+  {% endif %}
 
-    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-        <a href="{% url 'dashboard' %}" class="btn btn-gold">🏠 Retour au dashboard</a>
-        <a href="{% url 'leaderboard' %}" class="btn btn-outline">🏆 Classement</a>
+  <!-- ── Answer review ── -->
+  <div class="review-card">
+    <div class="review-title">Details de la reponse</div>
+    <div class="review-body">
+
+      <div class="review-question">{{ question.question_text }}</div>
+
+      <!-- A -->
+      {% if answer.selected_answer == 'A' and answer.is_correct %}
+        <div class="rev-opt user-correct">
+          <span class="rev-circle">A</span>
+          <span>{{ question.option_a }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Correct</span>
+        </div>
+      {% elif answer.selected_answer == 'A' %}
+        <div class="rev-opt user-wrong">
+          <span class="rev-circle">A</span>
+          <span>{{ question.option_a }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Incorrect</span>
+        </div>
+      {% elif question.correct_answer == 'A' %}
+        <div class="rev-opt correct-ans">
+          <span class="rev-circle">A</span>
+          <span>{{ question.option_a }}</span>
+          <span class="rev-indicator">Bonne reponse</span>
+        </div>
+      {% else %}
+        <div class="rev-opt neutral">
+          <span class="rev-circle">A</span>
+          <span>{{ question.option_a }}</span>
+        </div>
+      {% endif %}
+
+      <!-- B -->
+      {% if answer.selected_answer == 'B' and answer.is_correct %}
+        <div class="rev-opt user-correct">
+          <span class="rev-circle">B</span>
+          <span>{{ question.option_b }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Correct</span>
+        </div>
+      {% elif answer.selected_answer == 'B' %}
+        <div class="rev-opt user-wrong">
+          <span class="rev-circle">B</span>
+          <span>{{ question.option_b }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Incorrect</span>
+        </div>
+      {% elif question.correct_answer == 'B' %}
+        <div class="rev-opt correct-ans">
+          <span class="rev-circle">B</span>
+          <span>{{ question.option_b }}</span>
+          <span class="rev-indicator">Bonne reponse</span>
+        </div>
+      {% else %}
+        <div class="rev-opt neutral">
+          <span class="rev-circle">B</span>
+          <span>{{ question.option_b }}</span>
+        </div>
+      {% endif %}
+
+      <!-- C -->
+      {% if answer.selected_answer == 'C' and answer.is_correct %}
+        <div class="rev-opt user-correct">
+          <span class="rev-circle">C</span>
+          <span>{{ question.option_c }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Correct</span>
+        </div>
+      {% elif answer.selected_answer == 'C' %}
+        <div class="rev-opt user-wrong">
+          <span class="rev-circle">C</span>
+          <span>{{ question.option_c }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Incorrect</span>
+        </div>
+      {% elif question.correct_answer == 'C' %}
+        <div class="rev-opt correct-ans">
+          <span class="rev-circle">C</span>
+          <span>{{ question.option_c }}</span>
+          <span class="rev-indicator">Bonne reponse</span>
+        </div>
+      {% else %}
+        <div class="rev-opt neutral">
+          <span class="rev-circle">C</span>
+          <span>{{ question.option_c }}</span>
+        </div>
+      {% endif %}
+
+      <!-- D -->
+      {% if answer.selected_answer == 'D' and answer.is_correct %}
+        <div class="rev-opt user-correct">
+          <span class="rev-circle">D</span>
+          <span>{{ question.option_d }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Correct</span>
+        </div>
+      {% elif answer.selected_answer == 'D' %}
+        <div class="rev-opt user-wrong">
+          <span class="rev-circle">D</span>
+          <span>{{ question.option_d }}</span>
+          <span class="rev-indicator">Votre reponse &mdash; Incorrect</span>
+        </div>
+      {% elif question.correct_answer == 'D' %}
+        <div class="rev-opt correct-ans">
+          <span class="rev-circle">D</span>
+          <span>{{ question.option_d }}</span>
+          <span class="rev-indicator">Bonne reponse</span>
+        </div>
+      {% else %}
+        <div class="rev-opt neutral">
+          <span class="rev-circle">D</span>
+          <span>{{ question.option_d }}</span>
+        </div>
+      {% endif %}
+
     </div>
+  </div>
+
+  <!-- ── CTA buttons ── -->
+  <div class="result-cta">
+    <a href="{% url 'dashboard' %}" class="btn btn-gold">Tableau de bord</a>
+    <a href="{% url 'leaderboard' %}" class="btn btn-outline">Classement</a>
+    <a href="{% url 'profile' %}" class="btn btn-outline">Mon profil</a>
+  </div>
+
 </div>
 {% endblock %}

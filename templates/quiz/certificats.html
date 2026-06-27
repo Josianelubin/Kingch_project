@@ -1,0 +1,216 @@
+{% extends 'quiz/base.html' %}
+{% block title %}Mes certificats - KING CH{% endblock %}
+
+{% block extra_css %}
+<style>
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.cert-card {
+  background: var(--dark2);
+  border: 1px solid rgba(212,160,23,.25);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.cert-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(212,160,23,.5);
+  box-shadow: 0 12px 32px rgba(212,160,23,.12);
+}
+
+/* Certificate image */
+.cert-img-wrap {
+  position: relative;
+  background: linear-gradient(135deg, var(--dark3), rgba(212,160,23,.08));
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(212,160,23,.2);
+}
+.cert-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cert-no-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+}
+.cert-no-img-icon {
+  font-size: 3rem;
+  opacity: .3;
+}
+.cert-no-img-txt { font-size: 0.8rem; }
+
+/* Overlay download button on image */
+.cert-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all .2s;
+}
+.cert-card:hover .cert-img-overlay {
+  background: rgba(0,0,0,.45);
+  opacity: 1;
+}
+.cert-dl-btn {
+  background: var(--gold);
+  color: #0A0A10;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transform: translateY(6px);
+  transition: transform .2s;
+}
+.cert-card:hover .cert-dl-btn { transform: translateY(0); }
+
+/* Card body */
+.cert-body {
+  padding: 1.2rem;
+}
+.cert-body-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+.cert-body-desc {
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.55;
+  margin-bottom: 0.8rem;
+}
+.cert-body-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--muted);
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding-top: 0.8rem;
+  margin-top: 0.4rem;
+}
+.cert-body-pts {
+  background: rgba(212,160,23,.12);
+  border: 1px solid rgba(212,160,23,.25);
+  color: var(--gold);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+/* Empty state */
+.empty-certs {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--muted);
+}
+.empty-certs-icon {
+  font-size: 4rem;
+  opacity: .2;
+  margin-bottom: 1rem;
+  display: block;
+}
+.empty-certs-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.empty-certs-sub { font-size: 0.88rem; line-height: 1.6; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:1000px; margin:0 auto;">
+
+  <!-- Header -->
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h1 style="font-size:1.5rem; font-weight:800;">Mes certificats</h1>
+      <p style="color:var(--muted); font-size:0.88rem; margin-top:0.3rem;">
+        {{ certificates.count }} certificat{{ certificates.count|pluralize }} obtenu{{ certificates.count|pluralize }}
+      </p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline">Retour au tableau de bord</a>
+  </div>
+
+  {% if certificates %}
+  <div class="cert-grid">
+    {% for cert in certificates %}
+    <div class="cert-card">
+
+      <!-- Image area -->
+      <div class="cert-img-wrap">
+        {% if cert.certificate_image %}
+          <img src="{{ cert.certificate_image.url }}" alt="{{ cert.title }}">
+          <!-- Hover overlay -->
+          <div class="cert-img-overlay">
+            <a href="{{ cert.certificate_image.url }}" target="_blank" download class="cert-dl-btn">
+              Telecharger
+            </a>
+          </div>
+        {% else %}
+          <div class="cert-no-img">
+            <span class="cert-no-img-icon">&#127942;</span>
+            <span class="cert-no-img-txt">Aucune image</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Body -->
+      <div class="cert-body">
+        <div class="cert-body-title">{{ cert.title }}</div>
+        {% if cert.description %}
+          <div class="cert-body-desc">{{ cert.description }}</div>
+        {% endif %}
+        <div class="cert-body-meta">
+          <span>{{ cert.issued_at|date:"d F Y" }}</span>
+          <span class="cert-body-pts">{{ cert.points_required }} pts requis</span>
+        </div>
+        {% if cert.certificate_image %}
+        <a href="{{ cert.certificate_image.url }}" target="_blank" download
+           class="btn btn-gold" style="width:100%; justify-content:center; margin-top:1rem; padding:0.6rem;">
+          Telecharger le certificat
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="card">
+    <div class="empty-certs">
+      <span class="empty-certs-icon">&#127942;</span>
+      <div class="empty-certs-title">Aucun certificat pour le moment</div>
+      <div class="empty-certs-sub">
+        Continuez a repondre aux questions et a accumuler des points.<br>
+        Les certificats seront envoyes par l'administrateur selon vos performances.
+      </div>
+      <div style="margin-top:1.5rem;">
+        <a href="{% url 'dashboard' %}" class="btn btn-gold">Aller repondre aux questions</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

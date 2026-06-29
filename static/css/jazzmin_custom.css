@@ -1,667 +1,201 @@
-/* =============================================================
-   KING CH — Jazzmin Custom CSS
-   Theme: Dark Gold Professional
-   Compatible: Django 4.x + Jazzmin 2.6+ + Python 3.14
-   ============================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;900&display=swap');
-
-/* ── Variables ─────────────────────────────────────────────── */
-:root {
-  --kc-gold:       #D4A017;
-  --kc-gold-light: #F5CC5A;
-  --kc-black:      #080810;
-  --kc-dark:       #0D0D14;
-  --kc-dark2:      #141420;
-  --kc-dark3:      #1C1C2E;
-  --kc-border:     rgba(212,160,23,0.22);
-  --kc-text:       #E8E8F0;
-  --kc-muted:      #8892A4;
-  --kc-green:      #2ecc71;
-  --kc-red:        #e74c3c;
-  --kc-blue:       #3498db;
-}
-
-/* ── Global ─────────────────────────────────────────────────── */
-html, body, .wrapper {
-  background-color: var(--kc-dark) !important;
-  font-family: 'Inter', sans-serif !important;
-  color: var(--kc-text) !important;
-}
-
-/* ── Top Navbar ─────────────────────────────────────────────── */
-.main-header.navbar,
-.navbar-kingch {
-  background: linear-gradient(135deg, #080810 0%, #1C1C2E 100%) !important;
-  border-bottom: 2px solid var(--kc-gold) !important;
-  box-shadow: 0 4px 24px rgba(212,160,23,0.12) !important;
-}
-
-/* Brand / logo text */
-.navbar-brand-link .brand-text,
-.brand-text {
-  font-family: 'Montserrat', sans-serif !important;
-  font-weight: 900 !important;
-  font-size: 1.25rem !important;
-  color: var(--kc-gold) !important;
-  letter-spacing: 4px !important;
-  text-transform: uppercase !important;
-}
-
-/* Brand image (manno.png) */
-.navbar-brand-link .brand-image,
-.brand-image {
-  border: 2px solid var(--kc-gold) !important;
-  border-radius: 50% !important;
-  box-shadow: 0 0 12px rgba(212,160,23,0.3) !important;
-}
-
-/* Top nav links */
-.main-header .nav-link {
-  color: var(--kc-muted) !important;
-  font-size: 0.85rem !important;
-  font-weight: 500 !important;
-  transition: color 0.2s !important;
-}
-.main-header .nav-link:hover {
-  color: var(--kc-gold) !important;
+# ── Jazzmin ───────────────────────────────────────────────────────────────────
+JAZZMIN_SETTINGS = {
+    "site_title":        "KING CH Admin",
+    "site_header":       "KING CH",
+    "site_brand":        "KING CH",
+    "site_logo":         "images/manno.png",
+    "login_logo":        "images/manno.png",
+    "login_logo_dark":   "images/manno.png",
+    "site_logo_classes": "img-circle elevation-3",
+    "site_icon":         "images/manno.png",
+    "welcome_sign":      "Bienvenue dans le panneau KING CH",
+    "copyright":         "KING CH — Cree par Emmanuel Christopher Badio",
+    "search_model":      ["auth.user", "quiz.DailyQuestion"],
+    "user_avatar":       None,
+    "topmenu_links": [
+        {"name": "Tableau de bord", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Voir le site",    "url": "/",           "new_window": True},
+        {"model": "auth.User"},
+    ],
+    "usermenu_links": [
+        {"name": "Voir le site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
+        {"model": "auth.user"},
+    ],
+    "show_sidebar":        True,
+    "navigation_expanded": True,
+    "hide_apps":    [],
+    "hide_models":  [],
+    "order_with_respect_to": [
+        "auth", "quiz",
+        "quiz.UserProfile", "quiz.DailyQuestion",
+        "quiz.UserAnswer",  "quiz.Certificate", "quiz.Notification",
+    ],
+    "icons": {
+        "auth":               "fas fa-users-cog",
+        "auth.user":          "fas fa-user",
+        "auth.Group":         "fas fa-users",
+        "quiz.UserProfile":   "fas fa-id-card",
+        "quiz.DailyQuestion": "fas fa-question-circle",
+        "quiz.UserAnswer":    "fas fa-check-circle",
+        "quiz.Certificate":   "fas fa-award",
+        "quiz.Notification":  "fas fa-bell",
+    },
+    "default_icon_parents":  "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active":  True,
+    "custom_css":            "css/jazzmin_custom.css",
+    "custom_js":             None,
+    "use_google_fonts_cdn":  True,
+    "show_ui_builder":       False,
+    "changeform_format":     "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user":  "collapsible",
+        "auth.group": "vertical_tabs",
+    },
+    "language_chooser": False,
 }
 
-/* ── Sidebar ─────────────────────────────────────────────────── */
-.main-sidebar,
-.sidebar {
-  background: var(--kc-dark2) !important;
-  border-right: 1px solid var(--kc-border) !important;
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text":         False,
+    "footer_small_text":         True,
+    "body_small_text":           False,
+    "brand_small_text":          False,
+    "brand_colour":              "navbar-dark",
+    "accent":                    "accent-warning",
+    "navbar":                    "navbar-dark navbar-kingch",
+    "no_navbar_border":          True,
+    "navbar_fixed":              True,
+    "layout_boxed":              False,
+    "footer_fixed":              False,
+    "sidebar_fixed":             True,
+    "sidebar":                   "sidebar-dark-warning",
+    "sidebar_nav_small_text":    False,
+    "sidebar_disable_expand":    False,
+    "sidebar_nav_child_indent":  True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style":  False,
+    "sidebar_nav_flat_style":    False,
+    "theme":                     "darkly",
+    "dark_mode_theme":           "darkly",
+    "button_classes": {
+        "primary":   "btn-primary",
+        "secondary": "btn-secondary",
+        "info":      "btn-info",
+        "warning":   "btn-warning",
+        "danger":    "btn-danger",
+        "success":   "btn-success",
+    },
 }
 
-/* Sidebar brand area */
-.brand-link {
-  background: linear-gradient(135deg, #080810, #1C1C2E) !important;
-  border-bottom: 1px solid var(--kc-border) !important;
-  padding: 0.9rem 1rem !important;
+
+/* ===========================
+   KING CH - Admin Login Only
+=========================== */
+
+/* Arrière-plan */
+.login-page{
+    background: linear-gradient(135deg,#0f172a,#1d4ed8,#2563eb);
+    background-size: cover;
 }
 
-/* Sidebar nav items */
-.nav-sidebar .nav-link {
-  color: var(--kc-muted) !important;
-  font-weight: 500 !important;
-  font-size: 0.86rem !important;
-  border-radius: 8px !important;
-  margin: 2px 8px !important;
-  padding: 0.55rem 0.9rem !important;
-  transition: all 0.18s !important;
+/* Carte de connexion */
+.login-box .card{
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    overflow: hidden;
 }
 
-.nav-sidebar .nav-link:hover,
-.nav-sidebar .nav-link.active {
-  color: var(--kc-gold) !important;
-  background: rgba(212,160,23,0.1) !important;
-  border-left: 3px solid var(--kc-gold) !important;
+/* Corps du formulaire */
+.login-card-body{
+    padding: 35px;
+    background: #ffffff;
 }
 
-.sidebar-dark-warning .nav-sidebar > .nav-item > .nav-link.active {
-  background: linear-gradient(135deg, rgba(212,160,23,0.18), rgba(212,160,23,0.06)) !important;
-  color: var(--kc-gold) !important;
-  border-left: 3px solid var(--kc-gold) !important;
+/* Logo */
+.login-logo img{
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #facc15;
+    background: #fff;
+    padding: 6px;
+    box-shadow: 0 0 20px rgba(250,204,21,.5);
+    transition: .3s;
 }
 
-/* Section headers in sidebar */
-.nav-sidebar .nav-header {
-  color: var(--kc-gold) !important;
-  font-size: 0.68rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 2px !important;
-  text-transform: uppercase !important;
-  padding: 1rem 1rem 0.3rem !important;
-  opacity: 0.8;
+.login-logo img:hover{
+    transform: scale(1.05);
 }
 
-/* Sidebar nav icons */
-.nav-sidebar .nav-icon {
-  color: var(--kc-gold) !important;
-  opacity: 0.7;
-}
-.nav-sidebar .nav-link.active .nav-icon,
-.nav-sidebar .nav-link:hover .nav-icon {
-  opacity: 1;
+/* Titre */
+.login-logo a{
+    color: #facc15;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 2px;
 }
 
-/* ── Content area ────────────────────────────────────────────── */
-.content-wrapper {
-  background: var(--kc-dark) !important;
+/* Champs */
+.login-card-body .form-control{
+    height: 48px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
 }
 
-.content-header h1 {
-  font-family: 'Montserrat', sans-serif !important;
-  font-weight: 700 !important;
-  font-size: 1.35rem !important;
-  color: var(--kc-text) !important;
+.login-card-body .form-control:focus{
+    border-color: #2563eb;
+    box-shadow: 0 0 10px rgba(37,99,235,.3);
 }
 
-/* Breadcrumbs */
-.breadcrumb {
-  background: transparent !important;
-}
-.breadcrumb-item a {
-  color: var(--kc-gold) !important;
-  text-decoration: none;
-}
-.breadcrumb-item.active {
-  color: var(--kc-muted) !important;
-}
-.breadcrumb-item + .breadcrumb-item::before {
-  color: var(--kc-muted) !important;
+/* Icônes */
+.input-group-text{
+    background: #2563eb;
+    color: #fff;
+    border: none;
 }
 
-/* ── Cards ───────────────────────────────────────────────────── */
-.card {
-  background: var(--kc-dark2) !important;
-  border: 1px solid var(--kc-border) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+/* Bouton Connexion */
+.login-card-body .btn-primary{
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background: linear-gradient(to right,#2563eb,#1d4ed8);
+    transition: .3s;
 }
 
-.card-header {
-  background: var(--kc-dark3) !important;
-  border-bottom: 1px solid var(--kc-border) !important;
-  color: var(--kc-gold) !important;
-  font-weight: 700 !important;
-  font-size: 0.88rem !important;
-  border-radius: 12px 12px 0 0 !important;
-  padding: 0.85rem 1.2rem !important;
+.login-card-body .btn-primary:hover{
+    background: linear-gradient(to right,#1d4ed8,#1e40af);
+    transform: translateY(-2px);
 }
 
-.card-body { background: var(--kc-dark2) !important; }
-
-.card-footer {
-  background: var(--kc-dark3) !important;
-  border-top: 1px solid var(--kc-border) !important;
+/* Liens */
+.login-card-body a{
+    color: #2563eb;
+    text-decoration: none;
 }
 
-/* Info boxes on dashboard */
-.info-box {
-  background: var(--kc-dark2) !important;
-  border: 1px solid var(--kc-border) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-}
-.info-box-icon {
-  background: linear-gradient(135deg, var(--kc-gold), #B8860B) !important;
-  border-radius: 10px 0 0 10px !important;
-}
-.info-box-number {
-  color: var(--kc-gold) !important;
-  font-family: 'Montserrat', sans-serif !important;
-  font-weight: 700 !important;
-}
-.info-box-text {
-  color: var(--kc-muted) !important;
-  font-size: 0.78rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.login-card-body a:hover{
+    color: #1d4ed8;
+    text-decoration: underline;
 }
 
-/* ── Tables ──────────────────────────────────────────────────── */
-.table {
-  color: var(--kc-text) !important;
-  border-color: var(--kc-border) !important;
-  margin-bottom: 0 !important;
+/* Animation */
+.login-box{
+    animation: loginFade .8s ease;
 }
 
-.table thead th {
-  background: var(--kc-dark3) !important;
-  color: var(--kc-gold) !important;
-  font-weight: 700 !important;
-  font-size: 0.76rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1.2px !important;
-  border-bottom: 2px solid var(--kc-gold) !important;
-  border-color: var(--kc-border) !important;
-  padding: 0.85rem 1rem !important;
-  white-space: nowrap;
-}
-
-.table tbody tr {
-  background: var(--kc-dark2) !important;
-  transition: background 0.15s;
-}
-.table tbody tr:hover {
-  background: rgba(212,160,23,0.05) !important;
-}
-
-.table td, .table th {
-  border-color: rgba(255,255,255,0.05) !important;
-  padding: 0.7rem 1rem !important;
-  vertical-align: middle !important;
-  font-size: 0.86rem;
-}
-
-/* Striped */
-.table-striped tbody tr:nth-of-type(odd) {
-  background: rgba(255,255,255,0.02) !important;
-}
-
-/* ── Changelist ──────────────────────────────────────────────── */
-#changelist {
-  background: var(--kc-dark) !important;
-}
-#result_list {
-  background: var(--kc-dark2) !important;
-}
-#changelist-filter {
-  background: var(--kc-dark2) !important;
-  border-left: 1px solid var(--kc-border) !important;
-}
-#changelist-filter h2 {
-  background: var(--kc-dark3) !important;
-  color: var(--kc-gold) !important;
-  font-size: 0.78rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  padding: 0.7rem 1rem !important;
-}
-#changelist-filter li a {
-  color: var(--kc-muted) !important;
-  font-size: 0.84rem;
-  padding: 2px 1rem !important;
-  display: block;
-}
-#changelist-filter li.selected a,
-#changelist-filter li a:hover {
-  color: var(--kc-gold) !important;
-}
-
-/* Toolbar / search */
-#toolbar {
-  background: var(--kc-dark3) !important;
-  border-bottom: 1px solid var(--kc-border) !important;
-  padding: 0.6rem 1rem !important;
-}
-#searchbar, #toolbar input[type="text"] {
-  background: rgba(255,255,255,0.05) !important;
-  border: 1px solid var(--kc-border) !important;
-  border-radius: 8px !important;
-  color: white !important;
-  padding: 0.4rem 0.8rem !important;
-}
-
-/* Actions bar */
-.actions {
-  background: var(--kc-dark3) !important;
-  border: 1px solid var(--kc-border) !important;
-  border-radius: 10px !important;
-  padding: 0.7rem 1rem !important;
-  margin-bottom: 0.8rem;
-}
-.actions select {
-  background: rgba(255,255,255,0.05) !important;
-  color: white !important;
-  border-color: var(--kc-border) !important;
-  border-radius: 6px !important;
-}
-
-/* Pagination */
-.paginator a, .paginator span {
-  color: var(--kc-muted) !important;
-}
-.paginator .this-page {
-  background: var(--kc-gold) !important;
-  color: #0A0A10 !important;
-  font-weight: 700 !important;
-  border-radius: 6px !important;
-  padding: 2px 8px !important;
-}
-
-/* ── Forms ───────────────────────────────────────────────────── */
-.form-control,
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-input[type="url"],
-select,
-textarea {
-  background: rgba(255,255,255,0.05) !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: 8px !important;
-  color: var(--kc-text) !important;
-  font-size: 0.9rem !important;
-  font-family: 'Inter', sans-serif !important;
-  transition: border-color 0.2s, box-shadow 0.2s !important;
-}
-.form-control:focus,
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="number"]:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--kc-gold) !important;
-  box-shadow: 0 0 0 3px rgba(212,160,23,0.12) !important;
-  background: rgba(212,160,23,0.04) !important;
-  color: white !important;
-  outline: none !important;
-}
-
-label {
-  color: var(--kc-muted) !important;
-  font-size: 0.8rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 0.35rem;
-}
-
-.help {
-  color: var(--kc-muted) !important;
-  font-size: 0.78rem !important;
-}
-
-.errorlist li {
-  color: var(--kc-red) !important;
-  font-size: 0.82rem !important;
-}
-
-/* File upload */
-input[type="file"] {
-  color: var(--kc-muted) !important;
-  font-size: 0.85rem !important;
-}
-
-/* Checkbox */
-input[type="checkbox"] {
-  accent-color: var(--kc-gold);
-  width: 15px; height: 15px;
-}
-#action-toggle { accent-color: var(--kc-gold); }
-
-/* Fieldset */
-fieldset {
-  border: 1px solid var(--kc-border) !important;
-  border-radius: 10px !important;
-  padding: 1rem !important;
-  margin-bottom: 1rem !important;
-}
-fieldset h2, fieldset.module h2 {
-  background: var(--kc-dark3) !important;
-  color: var(--kc-gold) !important;
-  font-size: 0.78rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  padding: 0.5rem 0.8rem !important;
-  border-radius: 6px 6px 0 0 !important;
-  margin: -1rem -1rem 1rem -1rem !important;
-}
-
-/* Description text in fieldsets */
-.help-block, .form-text {
-  color: var(--kc-muted) !important;
-  font-size: 0.78rem !important;
-}
-
-/* ── Buttons ─────────────────────────────────────────────────── */
-.btn-primary,
-input[type="submit"].default {
-  background: linear-gradient(135deg, var(--kc-gold), #B8860B) !important;
-  border: none !important;
-  color: #080810 !important;
-  font-weight: 700 !important;
-  border-radius: 8px !important;
-  font-family: 'Inter', sans-serif !important;
-  transition: all 0.18s !important;
-}
-.btn-primary:hover,
-input[type="submit"].default:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px rgba(212,160,23,0.3) !important;
-}
-
-.btn-success { background: linear-gradient(135deg,#2ecc71,#27ae60) !important; border:none !important; color:white !important; font-weight:700 !important; border-radius:8px !important; }
-.btn-danger  { background: linear-gradient(135deg,#e74c3c,#c0392b) !important; border:none !important; color:white !important; font-weight:700 !important; border-radius:8px !important; }
-.btn-warning { background: linear-gradient(135deg,#f39c12,#d68910) !important; border:none !important; color:#0A0A10 !important; font-weight:700 !important; border-radius:8px !important; }
-.btn-info    { background: linear-gradient(135deg,#3498db,#2980b9) !important; border:none !important; color:white !important; font-weight:700 !important; border-radius:8px !important; }
-.btn-secondary,
-.btn-default {
-  background: rgba(255,255,255,0.07) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  color: var(--kc-text) !important;
-  font-weight:600 !important;
-  border-radius:8px !important;
-}
-.btn-secondary:hover, .btn-default:hover {
-  background: rgba(255,255,255,0.12) !important;
-}
-
-/* "Add" button (green + icon) */
-.object-tools .addlink {
-  background: linear-gradient(135deg,#2ecc71,#27ae60) !important;
-  color: white !important;
-  border-radius: 8px !important;
-  font-weight: 700 !important;
-  font-size: 0.82rem !important;
-  padding: 0.45rem 1rem !important;
-  transition: all 0.18s !important;
-}
-.object-tools .addlink:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 14px rgba(46,204,113,0.3) !important;
-}
-
-/* ── Inline action buttons (in list columns) ──────────────────── */
-.action-btn {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 6px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  text-decoration: none !important;
-  margin: 1px;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.action-btn:hover { opacity: 0.82; }
-
-.action-btn-block    { background:rgba(231,76,60,.18);   color:#e74c3c !important; border:1px solid rgba(231,76,60,.3); }
-.action-btn-unblock  { background:rgba(46,204,113,.18);  color:#2ecc71 !important; border:1px solid rgba(46,204,113,.3); }
-.action-btn-pts-add  { background:rgba(46,204,113,.18);  color:#2ecc71 !important; border:1px solid rgba(46,204,113,.3); }
-.action-btn-pts-rem  { background:rgba(243,156,18,.18);  color:#f39c12 !important; border:1px solid rgba(243,156,18,.3); }
-.action-btn-reset    { background:rgba(155,89,182,.18);  color:#9b59b6 !important; border:1px solid rgba(155,89,182,.3); }
-.action-btn-cert     { background:rgba(212,160,23,.18);  color:#D4A017 !important; border:1px solid rgba(212,160,23,.3); }
-.action-btn-hist     { background:rgba(243,156,18,.14);  color:#f39c12 !important; border:1px solid rgba(243,156,18,.25);}
-.action-btn-delete   { background:rgba(231,76,60,.14);   color:#e74c3c !important; border:1px solid rgba(231,76,60,.22); }
-
-/* ── Alerts / Messages ───────────────────────────────────────── */
-.alert {
-  border-radius: 10px !important;
-  border: none !important;
-  font-weight: 500 !important;
-  font-size: 0.88rem !important;
-}
-.alert-success { background:rgba(46,204,113,.13)  !important; color:#2ecc71 !important; border-left:4px solid #2ecc71 !important; }
-.alert-danger  { background:rgba(231,76,60,.13)   !important; color:#e74c3c !important; border-left:4px solid #e74c3c !important; }
-.alert-warning { background:rgba(243,156,18,.13)  !important; color:#f39c12 !important; border-left:4px solid #f39c12 !important; }
-.alert-info    { background:rgba(52,152,219,.13)   !important; color:#3498db !important; border-left:4px solid #3498db !important; }
-
-/* Django messages */
-.messagelist li {
-  border-radius: 10px !important;
-  font-size: 0.88rem !important;
-  font-weight: 500 !important;
-  padding: 0.7rem 1rem !important;
-}
-.messagelist .success { background:rgba(46,204,113,.13) !important;  color:#2ecc71 !important; }
-.messagelist .error   { background:rgba(231,76,60,.13)  !important;  color:#e74c3c !important; }
-.messagelist .warning { background:rgba(243,156,18,.13) !important;  color:#f39c12 !important; }
-
-/* ── Badges ──────────────────────────────────────────────────── */
-.badge-success { background:rgba(46,204,113,.2)  !important; color:#2ecc71 !important; }
-.badge-danger  { background:rgba(231,76,60,.2)   !important; color:#e74c3c !important; }
-.badge-warning { background:rgba(243,156,18,.2)  !important; color:#f39c12 !important; }
-.badge-info    { background:rgba(52,152,219,.2)   !important; color:#3498db !important; }
-.badge-primary { background:rgba(212,160,23,.2)  !important; color:var(--kc-gold) !important; }
-
-/* ── Tabs (changeform) ───────────────────────────────────────── */
-.nav-tabs {
-  border-bottom-color: var(--kc-border) !important;
-}
-.nav-tabs .nav-link {
-  color: var(--kc-muted) !important;
-  border-color: transparent !important;
-  font-weight: 500 !important;
-  font-size: 0.86rem !important;
-}
-.nav-tabs .nav-link.active {
-  background: var(--kc-dark3) !important;
-  color: var(--kc-gold) !important;
-  border-color: var(--kc-border) var(--kc-border) var(--kc-dark3) !important;
-}
-.tab-content {
-  background: var(--kc-dark2) !important;
-  border: 1px solid var(--kc-border) !important;
-  border-top: none !important;
-  border-radius: 0 0 10px 10px !important;
-  padding: 1.2rem !important;
-}
-
-/* ── Footer ──────────────────────────────────────────────────── */
-.main-footer {
-  background: var(--kc-dark2) !important;
-  border-top: 1px solid var(--kc-border) !important;
-  color: var(--kc-muted) !important;
-  font-size: 0.78rem !important;
-}
-.main-footer a { color: var(--kc-gold) !important; }
-
-/* ── LOGIN PAGE ──────────────────────────────────────────────── */
-body.login-page {
-  background: var(--kc-black) !important;
-  background-image:
-    radial-gradient(ellipse 80% 45% at 50% -10%, rgba(212,160,23,0.1) 0%, transparent 65%)
-    !important;
-}
-
-/* Login card */
-.login-box,
-.login-card-body {
-  background: var(--kc-dark2) !important;
-  border: 1px solid var(--kc-border) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.55) !important;
-  padding: 2rem !important;
-}
-
-/* Login logo */
-.login-logo {
-  margin-bottom: 0.5rem !important;
-}
-.login-logo img {
-  width: 90px !important;
-  height: 90px !important;
-  border-radius: 50% !important;
-  border: 3px solid var(--kc-gold) !important;
-  box-shadow: 0 0 24px rgba(212,160,23,0.35) !important;
-  object-fit: cover !important;
-  display: block !important;
-  margin: 0 auto !important;
-}
-/* Fallback text under logo */
-.login-logo p,
-.login-logo a {
-  font-family: 'Montserrat', sans-serif !important;
-  font-weight: 900 !important;
-  font-size: 1.4rem !important;
-  color: var(--kc-gold) !important;
-  letter-spacing: 4px !important;
-  text-transform: uppercase !important;
-  text-decoration: none !important;
-  display: block;
-  text-align: center;
-  margin-top: 0.6rem;
-}
-
-/* Login welcome text */
-.login-box-msg,
-.card-body .login-box-msg {
-  color: var(--kc-muted) !important;
-  font-size: 0.88rem !important;
-  text-align: center !important;
-  margin-bottom: 1.2rem !important;
-}
-
-/* Login button */
-.login-box .btn-primary,
-.login-card-body .btn-primary {
-  background: linear-gradient(135deg, var(--kc-gold), #B8860B) !important;
-  border: none !important;
-  color: #080810 !important;
-  font-weight: 800 !important;
-  font-size: 0.95rem !important;
-  padding: 0.8rem !important;
-  border-radius: 10px !important;
-  width: 100% !important;
-  letter-spacing: 1px !important;
-}
-.login-box .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(212,160,23,0.35) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* ── Scrollbar ───────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--kc-dark); }
-::-webkit-scrollbar-thumb { background: var(--kc-border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--kc-gold); }
-
-/* ── Global links ────────────────────────────────────────────── */
-a:not(.btn):not(.nav-link):not(.brand-link):not(.action-btn) {
-  color: var(--kc-gold) !important;
-}
-a:not(.btn):not(.nav-link):not(.brand-link):not(.action-btn):hover {
-  color: var(--kc-gold-light) !important;
-}
-
-/* ── Module headings (old-style django admin) ─────────────────── */
-.module h2, .module caption {
-  background: var(--kc-dark3) !important;
-  color: var(--kc-gold) !important;
-  font-weight: 700 !important;
-  font-size: 0.78rem !important;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* ── Date hierarchy ──────────────────────────────────────────── */
-.xfull .datetimeshortcuts a {
-  color: var(--kc-gold) !important;
-}
-
-/* ── Related widget ──────────────────────────────────────────── */
-.related-widget-wrapper .selector-chosen h2,
-.related-widget-wrapper .selector-available h2 {
-  background: var(--kc-dark3) !important;
-  color: var(--kc-gold) !important;
-}
-.selector-available select,
-.selector-chosen select {
-  background: var(--kc-dark2) !important;
-  border-color: var(--kc-border) !important;
-}
-
-/* ── Image thumbnails in list ────────────────────────────────── */
-.field-cert_thumb img,
-.field-col_thumb img,
-.field-cert_preview img {
-  border: 1px solid rgba(212,160,23,.4);
-  border-radius: 6px;
-}
-
-/* ── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .main-sidebar { z-index: 1050 !important; }
-  .action-btn   { font-size: 0.68rem !important; padding: 2px 6px !important; }
+@keyframes loginFade{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }

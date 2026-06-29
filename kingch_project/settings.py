@@ -156,6 +156,7 @@ if not DEBUG:
     SESSION_COOKIE_HTTPONLY       = True
     CSRF_COOKIE_HTTPONLY          = True
 
+
 # ── Jazzmin ───────────────────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
     "site_title":        "KING CH Admin",

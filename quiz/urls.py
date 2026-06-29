@@ -9,9 +9,12 @@ urlpatterns = [
     path('dashboard/',                     views.dashboard_view,    name='dashboard'),
     path('quiz/<int:question_id>/',        views.quiz_view,         name='quiz'),
     path('quiz/<int:question_id>/result/', views.quiz_result_view,  name='quiz_result'),
+    # IMPORTANT: profile/edit/ MUST come before profile/<str:username>/
+    # otherwise Django matches 'edit' as a username string
     path('profile/',                       views.profile_view,      name='profile'),
-    path('profile/<str:username>/',        views.profile_view,      name='profile_detail'),
     path('edit_profile/',                  views.edit_profile_view, name='edit_profile'),
+    path('profile/<str:username>/',        views.profile_view,      name='profile_detail'),
+    path('parrainage/',                    views.parrainage_view,   name='parrainage'),
     path('certificats/',                   views.certificats_view,  name='certificats'),
     path('settings/',                      views.settings_view,     name='settings'),
     path('notifications/',                 views.notifications_view,name='notifications'),

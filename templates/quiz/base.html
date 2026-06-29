@@ -353,6 +353,7 @@
   <ul class="nav-links">
     <li><a href="{% url 'dashboard' %}">Accueil</a></li>
     <li><a href="{% url 'certificats' %}">Certificats</a></li>
+    <li><a href="{% url 'parrainage' %}">Inviter des amis</a></li>
     <li><a href="{% url 'leaderboard' %}">Classement</a></li>
     <li>
       <a href="{% url 'notifications' %}">
@@ -394,6 +395,7 @@
           {% if user.is_authenticated %}
           <a href="{% url 'dashboard' %}">Dashboard</a>
           <a href="{% url 'certificats' %}">Mes certificats</a>
+          <a href="{% url 'parrainage' %}">Inviter des amis</a>
           <a href="{% url 'leaderboard' %}">Classement</a>
           <a href="{% url 'profile' %}">Mon profil</a>
           <a href="{% url 'settings' %}">Parametres</a>
@@ -413,7 +415,7 @@
           WhatsApp
         </a>
         <a href="{% url 'createur' %}" class="footer-creator-link">
-          Cree par Emmanuel Christopher Badio
+          Créer par Emmanuel Christopher Badio
         </a>
       </div>
     </div>
@@ -421,7 +423,7 @@
     <div class="footer-bottom">
       <span class="footer-copy">&copy; 2026 KING CH &mdash; Tous droits reserves</span>
       <div class="footer-bottom-links">
-        <a href="{% url 'createur' %}">Createur est Emmanuel christopher badio</a>
+        <a href="{% url 'createur' %}">Createur</a>
         {% if user.is_staff %}<a href="/admin/">Administration</a>{% endif %}
       </div>
     </div>

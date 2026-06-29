@@ -3,10 +3,10 @@
 
 {% block extra_css %}
 <style>
-.auth-wrap { max-width: 480px; margin: 3rem auto; }
+.auth-wrap { max-width:480px; margin:3rem auto; }
 .auth-head { text-align:center; margin-bottom:2rem; }
 .auth-logo { font-family:'Cinzel Decorative',cursive; font-size:1.6rem; font-weight:900; color:var(--gold); letter-spacing:3px; }
-.auth-sub  { color:var(--muted); font-size:0.88rem; margin-top:0.4rem; }
+.auth-sub  { color:var(--muted); font-size:.88rem; margin-top:.4rem; }
 .auth-card { background:var(--dark2); border:1px solid var(--border); border-radius:18px; padding:2.2rem; }
 .row-2     { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 </style>
@@ -22,6 +22,7 @@
   <div class="auth-card">
     <form method="post">
       {% csrf_token %}
+      <input type="hidden" name="ref_code" value="{{ ref_code }}">
 
       <div class="row-2">
         <div class="form-group">
@@ -60,17 +61,30 @@
         {% if form.password2.errors %}<div class="form-error">{{ form.password2.errors.0 }}</div>{% endif %}
       </div>
 
+      <!-- Referral code field -->
+      <div class="form-group">
+        <label class="form-label">Code de parrainage (optionnel)</label>
+        <input type="text" name="ref_code" value="{{ ref_code }}"
+               class="form-input" placeholder="Ex: AB12CD34" maxlength="12"
+               style="{% if ref_code %}border-color:rgba(212,160,23,.5); background:rgba(212,160,23,.05);{% endif %}">
+        {% if ref_code %}
+        <div style="color:var(--gold); font-size:.78rem; margin-top:.3rem; font-weight:600;">
+          Code de parrainage detecte : {{ ref_code }}
+        </div>
+        {% endif %}
+      </div>
+
       {% if form.non_field_errors %}
         <div class="flash error" style="margin-bottom:1rem;">{{ form.non_field_errors.0 }}</div>
       {% endif %}
 
-      <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;padding:0.9rem;margin-top:0.4rem;">
+      <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;padding:.9rem;margin-top:.4rem;">
         Creer mon compte
       </button>
     </form>
   </div>
 
-  <div style="text-align:center; margin-top:1.4rem; color:var(--muted); font-size:0.88rem;">
+  <div style="text-align:center; margin-top:1.4rem; color:var(--muted); font-size:.88rem;">
     Deja un compte ? <a href="{% url 'login' %}" style="color:var(--gold); text-decoration:none; font-weight:600;">Se connecter</a>
   </div>
 </div>

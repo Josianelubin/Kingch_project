@@ -4,13 +4,21 @@
 {% block object-tools-items %}
   {{ block.super }}
   <li>
-    <a
-      href="{% url 'admin:reset_all_points' %}"
-      class="addlink"
-      style="background:linear-gradient(135deg,#e74c3c,#c0392b) !important; color:white !important; border:none; font-weight:700;"
-      onclick="return confirm('Acceder a la page de reinitialisation globale des points?')"
-    >
-      Reinitialiser tous les points
+    <a href="{{ reset_today_url }}"
+       style="background:linear-gradient(135deg,#f39c12,#d68910)!important;
+              color:#0A0A10!important; border:none; font-weight:700; margin-right:4px;"
+       class="addlink"
+       onclick="return confirm('Acceder a la page de reinitialisation des points du JOUR ?')">
+      Reset points du jour
+    </a>
+  </li>
+  <li>
+    <a href="{{ reset_all_url }}"
+       style="background:linear-gradient(135deg,#e74c3c,#c0392b)!important;
+              color:white!important; border:none; font-weight:700;"
+       class="addlink"
+       onclick="return confirm('Acceder a la page de reinitialisation des points TOTAUX ?')">
+      Reset points totaux
     </a>
   </li>
 {% endblock %}

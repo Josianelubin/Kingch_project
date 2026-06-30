@@ -120,6 +120,35 @@ elles, resteront intactes).
 
 ---
 
+## Depannage — erreur "Invalid CLOUDINARY_URL scheme"
+
+Si vos logs Render affichent :
+```
+ValueError: Invalid CLOUDINARY_URL scheme. Expecting to start with 'cloudinary://'
+```
+
+Cela signifie que la variable `CLOUDINARY_URL` collee sur Render est
+mal formee. Causes les plus frequentes :
+
+1. **Le prefixe `cloudinary://` est manquant** — vous avez colle
+   uniquement `CLE:SECRET@CLOUD_NAME` sans le debut.
+2. **Des guillemets ont ete colles par erreur**, ex:
+   `"cloudinary://..."` au lieu de `cloudinary://...`
+3. **Un espace** s'est glisse au debut ou a la fin de la valeur.
+
+**Cette version du projet corrige automatiquement ces 3 cas** (le
+code nettoie la valeur au demarrage). Si l'erreur persiste malgre
+tout, verifiez que :
+- Le **Secret de l'API** a bien ete "Revele" et copie en entier sur
+  Cloudinary (pas seulement les premiers caracteres visibles)
+- Aucun retour a la ligne ne s'est glisse dans le champ Render
+- La variable s'appelle exactement `CLOUDINARY_URL` (sensible a la
+  casse) dans l'onglet Environment de Render
+
+Apres correction, Render redeploiera automatiquement.
+
+---
+
 ## Recapitulatif des variables d'environnement Render
 
 | Variable | Obligatoire | Role |

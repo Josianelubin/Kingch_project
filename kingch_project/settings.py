@@ -160,7 +160,44 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # En local (developpement), sans aucune de ces variables, le stockage
 # reste local dans media/ comme avant — rien ne change pour vous en dev.
 
-if os.environ.get('CLOUDINARY_URL'):
+def _clean_cloudinary_url(raw_url):
+    """
+    Nettoie et valide la variable CLOUDINARY_URL pour eviter le crash
+    'Invalid CLOUDINARY_URL scheme' cause par des espaces, guillemets,
+    ou un prefixe 'cloudinary://' manquant/duplique.
+    Retourne None si la valeur est invalide ou absente.
+    """
+    if not raw_url:
+        return None
+    url = raw_url.strip().strip('"').strip("'")
+    if not url:
+        return None
+    # Corrige les variantes mal formees du prefixe
+    if url.startswith('cloudinary:') and not url.startswith('cloudinary://'):
+        url = 'cloudinary://' + url[len('cloudinary:'):]
+    elif not url.startswith('cloudinary://'):
+        url = 'cloudinary://' + url
+    # Verification minimale du format attendu : cloudinary://key:secret@cloud
+    body = url[len('cloudinary://'):]
+    if '@' not in body or ':' not in body.split('@')[0]:
+        return None
+    return url
+
+
+_cloudinary_raw   = os.environ.get('CLOUDINARY_URL', '')
+_cloudinary_clean = _clean_cloudinary_url(_cloudinary_raw)
+
+if _cloudinary_raw and not _cloudinary_clean:
+    # La variable existe mais est mal formee — on previent dans les logs
+    # au lieu de laisser Django planter au demarrage.
+    print(
+        "ATTENTION: CLOUDINARY_URL est definie mais mal formee. "
+        "Format attendu: cloudinary://API_KEY:API_SECRET@CLOUD_NAME — "
+        "le stockage local sera utilise a la place (non persistant)."
+    )
+
+if _cloudinary_clean:
+    os.environ['CLOUDINARY_URL'] = _cloudinary_clean  # normalise pour le SDK
     # ── OPTION A : Cloudinary ──────────────────────────────────────────────
     INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

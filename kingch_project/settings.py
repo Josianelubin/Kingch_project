@@ -27,6 +27,17 @@ else:
         '.onrender.com,localhost,127.0.0.1'
     ).split(',')
 
+# CSRF_TRUSTED_ORIGINS est OBLIGATOIRE sur Render avec Django 4+
+# sinon les formulaires (login admin inclus) renvoient une erreur 403 CSRF
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{h.strip().lstrip('.')}" if not h.strip().startswith('.') else f"https://*{h.strip()}"
+    for h in os.environ.get('ALLOWED_HOSTS', '.onrender.com').split(',')
+    if h.strip()
+]
+# Toujours inclure le domaine onrender.com par defaut
+if 'https://*.onrender.com' not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append('https://*.onrender.com')
+
 # ── Apps ──────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'jazzmin',                          # DOIT etre avant django.contrib.admin
@@ -130,6 +141,48 @@ else:
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ── Stockage des fichiers media (images) ───────────────────────────────────────
+# PROBLEME RESOLU : sans ceci, les photos de profil, certificats, et le logo
+# manno.png uploades depuis l'admin sont stockes sur le disque ephemere de
+# Render et disparaissent a chaque redemarrage du service.
+#
+# Deux options possibles (au choix). Si les deux sont configurees,
+# Cloudinary est utilise en priorite.
+#
+# OPTION A — Cloudinary (https://cloudinary.com)
+#   Variable a definir sur Render :
+#     CLOUDINARY_URL = cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+#
+# OPTION B — Backblaze B2 (https://www.backblaze.com)
+#   Variables a definir sur Render :
+#     B2_ACCESS_KEY_ID, B2_SECRET_ACCESS_KEY, B2_BUCKET_NAME, B2_ENDPOINT_URL
+#
+# En local (developpement), sans aucune de ces variables, le stockage
+# reste local dans media/ comme avant — rien ne change pour vous en dev.
+
+if os.environ.get('CLOUDINARY_URL'):
+    # ── OPTION A : Cloudinary ──────────────────────────────────────────────
+    INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+elif os.environ.get('B2_ACCESS_KEY_ID'):
+    # ── OPTION B : Backblaze B2 (compatible S3) ────────────────────────────
+    INSTALLED_APPS += ['storages']
+
+    AWS_ACCESS_KEY_ID       = os.environ.get('B2_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY   = os.environ.get('B2_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL     = os.environ.get('B2_ENDPOINT_URL')
+    AWS_S3_REGION_NAME      = os.environ.get('B2_REGION', 'us-west-004')
+
+    AWS_DEFAULT_ACL          = 'public-read'
+    AWS_QUERYSTRING_AUTH     = False
+    AWS_S3_FILE_OVERWRITE    = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── Email ─────────────────────────────────────────────────────────────────────
@@ -156,15 +209,14 @@ if not DEBUG:
     SESSION_COOKIE_HTTPONLY       = True
     CSRF_COOKIE_HTTPONLY          = True
 
-
 # ── Jazzmin ───────────────────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
     "site_title":        "KING CH Admin",
     "site_header":       "KING CH",
     "site_brand":        "KING CH",
-    "site_logo":         "images/manno.png",
-    "login_logo":        "images/manno.png",
-    "login_logo_dark":   "images/manno.png",
+    "site_logo":         "images/manno.png",   # shown in sidebar
+    "login_logo":        None,                  # no logo on login page
+    "login_logo_dark":   None,                  # no logo on login page
     "site_logo_classes": "img-circle elevation-3",
     "site_icon":         "images/manno.png",
     "welcome_sign":      "Bienvenue dans le panneau KING CH",

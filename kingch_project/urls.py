@@ -11,10 +11,7 @@ urlpatterns = [
     path('', include('quiz.urls')),
 ]
 
-# Serve media files in development (DEBUG=True)
-# In production (Render), use a CDN or cloud storage
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # Still serve media in production for simplicity (Render ephemeral disk)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Sert les fichiers media en local (DEBUG) ou si Cloudinary n'est pas configure.
+# Sans danger meme avec Cloudinary actif : les nouvelles images utilisent
+# une URL Cloudinary externe, cette route ne sert que d'ancien fallback local.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

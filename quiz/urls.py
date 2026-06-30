@@ -12,7 +12,7 @@ urlpatterns = [
     # IMPORTANT: profile/edit/ MUST come before profile/<str:username>/
     # otherwise Django matches 'edit' as a username string
     path('profile/',                       views.profile_view,      name='profile'),
-    path('edit_profile/',                  views.edit_profile_view, name='edit_profile'),
+    path('profile/edit/',                  views.edit_profile_view, name='edit_profile'),
     path('profile/<str:username>/',        views.profile_view,      name='profile_detail'),
     path('parrainage/',                    views.parrainage_view,   name='parrainage'),
     path('certificats/',                   views.certificats_view,  name='certificats'),

@@ -288,6 +288,32 @@
   </div>
 
   <!-- ── CTA buttons ── -->
+  {% if answer.is_correct and current_rank %}
+  <div style="margin-bottom:1.2rem; padding:1rem 1.4rem; border-radius:14px; text-align:center;
+    {% if current_rank == 1 %}
+      background:linear-gradient(135deg,rgba(212,160,23,.18),rgba(212,160,23,.05));
+      border:2px solid rgba(212,160,23,.45);
+    {% elif current_rank <= 3 %}
+      background:rgba(46,204,113,.1); border:1px solid rgba(46,204,113,.3);
+    {% elif current_rank <= 10 %}
+      background:rgba(52,152,219,.08); border:1px solid rgba(52,152,219,.2);
+    {% else %}background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);{% endif %}">
+    {% if current_rank == 1 %}
+      <div style="font-size:1.5rem; margin-bottom:.3rem;">&#127894;</div>
+      <div style="color:var(--gold); font-weight:800; font-size:1rem;">Vous etes 1er du classement !</div>
+      <div style="color:var(--muted); font-size:.82rem; margin-top:.3rem;">Verifiez vos notifications</div>
+    {% elif current_rank == 2 %}
+      <div style="font-size:1.3rem; margin-bottom:.3rem;">&#129352;</div>
+      <div style="color:#2ecc71; font-weight:700; font-size:.95rem;">Vous etes 2eme du classement !</div>
+    {% elif current_rank == 3 %}
+      <div style="font-size:1.3rem; margin-bottom:.3rem;">&#129353;</div>
+      <div style="color:#CD7F32; font-weight:700; font-size:.95rem;">Vous etes 3eme du classement !</div>
+    {% elif current_rank <= 10 %}
+      <div style="color:#3498db; font-weight:600; font-size:.9rem;">Vous etes {{ current_rank }}eme du classement</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <div class="result-cta">
     <a href="{% url 'dashboard' %}" class="btn btn-gold">Tableau de bord</a>
     <a href="{% url 'leaderboard' %}" class="btn btn-outline">Classement</a>

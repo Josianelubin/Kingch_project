@@ -134,6 +134,77 @@ def dashboard_view(request):
     })
 
 
+def _check_leaderboard_notifications(user, profile):
+    """
+    Verifie le rang de l utilisateur apres avoir gagne des points.
+    Envoie des notifications automatiques selon le rang atteint.
+    """
+    # Rang actuel (combien de profils ont PLUS de points que lui)
+    rank = UserProfile.objects.filter(
+        total_points__gt=profile.total_points,
+        is_blocked=False
+    ).count() + 1
+
+    # Evite les doublons : ne notifie pas si le meme rang a deja ete notifie
+    already_notified_key = f"Vous etes maintenant {rank}"
+    already_sent = Notification.objects.filter(
+        user=user,
+        message__startswith=already_notified_key
+    ).exists()
+
+    if already_sent:
+        return  # pas de doublon
+
+    if rank == 1:
+        # Devenu premier du classement
+        Notification.objects.create(
+            user=user,
+            message=(
+                f"Felicitations ! Vous etes maintenant 1er du classement KING CH "
+                f"avec {profile.total_points} points. Vous etes le meilleur !"
+            )
+        )
+        # Notifie aussi l ancien premier (l autre joueur qui perd sa place)
+        ex_leaders = UserProfile.objects.filter(
+            total_points__lte=profile.total_points,
+            is_blocked=False
+        ).exclude(user=user).order_by('-total_points')[:1]
+        for ex in ex_leaders:
+            Notification.objects.create(
+                user=ex.user,
+                message=(
+                    f"{user.first_name or user.username} vient de vous depasser "
+                    f"et prend la 1ere place du classement avec {profile.total_points} points. "
+                    f"Repondez aux questions pour reprendre votre place !"
+                )
+            )
+
+    elif rank == 2:
+        Notification.objects.create(
+            user=user,
+            message=(
+                f"Vous etes maintenant 2eme du classement avec {profile.total_points} points. "
+                f"Encore un effort pour atteindre la 1ere place !"
+            )
+        )
+    elif rank == 3:
+        Notification.objects.create(
+            user=user,
+            message=(
+                f"Vous etes maintenant 3eme du classement avec {profile.total_points} points. "
+                f"Continuez, le podium est a vous !"
+            )
+        )
+    elif rank <= 10:
+        Notification.objects.create(
+            user=user,
+            message=(
+                f"Vous etes maintenant {rank}eme du classement avec {profile.total_points} points. "
+                f"Continuez vos efforts !"
+            )
+        )
+
+
 # ── Quiz ───────────────────────────────────────────────────────────────────────
 @login_required
 def quiz_view(request, question_id):
@@ -150,6 +221,16 @@ def quiz_view(request, question_id):
 
     if request.method == 'POST':
         selected = request.POST.get('answer')
+
+        # TIMEOUT : le temps est ecoule, on enregistre 0 point
+        if selected == 'TIMEOUT':
+            UserAnswer.objects.create(
+                user=user, question=question,
+                selected_answer='A',
+                is_correct=False, points_earned=0
+            )
+            return redirect('dashboard')
+
         if selected in ['A', 'B', 'C', 'D']:
             is_correct = (selected == question.correct_answer)
             pts = question.points if is_correct else 0
@@ -158,22 +239,47 @@ def quiz_view(request, question_id):
                 selected_answer=selected, is_correct=is_correct, points_earned=pts
             )
             if is_correct:
-                profile.total_points += pts; profile.save()
+                profile.total_points += pts
+                profile.save()
                 messages.success(request, f"Bonne reponse ! +{pts} points !")
+                # Verifie et notifie selon le rang atteint
+                _check_leaderboard_notifications(user, profile)
             else:
                 correct_text = getattr(question, f'option_{question.correct_answer.lower()}')
-                messages.error(request, f"Mauvaise reponse. La bonne reponse etait : ({question.correct_answer}) {correct_text}")
+                messages.error(request,
+                    f"Mauvaise reponse. La bonne reponse etait : ({question.correct_answer}) {correct_text}")
             return redirect('quiz_result', question_id=question.id)
         else:
             messages.error(request, "Veuillez selectionner une reponse.")
-    return render(request, 'quiz/quiz.html', {'question': question})
+
+    from django.conf import settings as django_settings
+    timer = getattr(django_settings, 'QUIZ_TIMER_SECONDS', 10)
+    return render(request, 'quiz/quiz.html', {
+        'question': question,
+        'QUIZ_TIMER_SECONDS': timer,
+    })
 
 
 @login_required
 def quiz_result_view(request, question_id):
     question = get_object_or_404(DailyQuestion, id=question_id)
     answer   = get_object_or_404(UserAnswer, user=request.user, question=question)
-    return render(request, 'quiz/quiz_result.html', {'question': question, 'answer': answer})
+
+    # Rang actuel apres avoir repondu
+    try:
+        profile = request.user.profile
+        current_rank = UserProfile.objects.filter(
+            total_points__gt=profile.total_points,
+            is_blocked=False
+        ).count() + 1
+    except Exception:
+        current_rank = None
+
+    return render(request, 'quiz/quiz_result.html', {
+        'question':     question,
+        'answer':       answer,
+        'current_rank': current_rank,
+    })
 
 
 # ── Profile ────────────────────────────────────────────────────────────────────

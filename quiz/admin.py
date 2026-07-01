@@ -119,6 +119,9 @@ class CustomUserAdmin(UserAdmin):
                     Notification.objects.create(user=u,
                         message=f"L'admin a ajoute {pts} points. Total : {p.total_points} pts")
                     messages.success(request, f"+{pts} pts ajoutes a '{u.username}'.")
+                    # Verifie si l utilisateur devient premier du classement
+                    from quiz.views import _check_leaderboard_notifications
+                    _check_leaderboard_notifications(u, p)
             except ValueError:
                 messages.error(request, "Valeur invalide.")
             return redirect('admin:auth_user_changelist')

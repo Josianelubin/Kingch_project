@@ -1,7 +1,7 @@
 """
 KING CH - Settings
-  - En local (DEBUG=True)  : python manage.py runserver  -> http://127.0.0.1:8000
-  - En production (Render) : DEBUG=False via variable d'env
+  - En local (DEBUG=True)  : python manage.py runserver -> http://127.0.0.1:8000
+  - En production (Render) : DEBUG=False via variable d environnement
 """
 from pathlib import Path
 import os
@@ -14,33 +14,32 @@ SECRET_KEY = os.environ.get(
     'django-insecure-kingch-local-dev-key-change-in-prod-2024'
 )
 
-# ── Debug / Hosts ─────────────────────────────────────────────────────────────
-# En local : variable DEBUG absente => True
-# Sur Render : mettre DEBUG=False dans les variables d'environnement
-DEBUG = os.environ.get('DEBUG', 'True').strip().lower() in ('true', '1', 'yes')
+# ── Debug ─────────────────────────────────────────────────────────────────────
+# CORRECTION : on teste si DEBUG est explicitement False/false/0/no
+# car la comparaison precedente ratait quand Render envoyait 'False' (majuscule)
+_debug_env = os.environ.get('DEBUG', 'True').strip().lower()
+DEBUG = _debug_env not in ('false', '0', 'no', 'off')
 
+# ── Hosts & CSRF ──────────────────────────────────────────────────────────────
 if DEBUG:
     ALLOWED_HOSTS = ['*']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 else:
     ALLOWED_HOSTS = os.environ.get(
-        'ALLOWED_HOSTS',
-        '.onrender.com,localhost,127.0.0.1'
+        'ALLOWED_HOSTS', '.onrender.com,localhost,127.0.0.1'
     ).split(',')
-
-# CSRF_TRUSTED_ORIGINS est OBLIGATOIRE sur Render avec Django 4+
-# sinon les formulaires (login admin inclus) renvoient une erreur 403 CSRF
-CSRF_TRUSTED_ORIGINS = [
-    f"https://{h.strip().lstrip('.')}" if not h.strip().startswith('.') else f"https://*{h.strip()}"
-    for h in os.environ.get('ALLOWED_HOSTS', '.onrender.com').split(',')
-    if h.strip()
-]
-# Toujours inclure le domaine onrender.com par defaut
-if 'https://*.onrender.com' not in CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS.append('https://*.onrender.com')
+    CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+    # Ajoute chaque host de ALLOWED_HOSTS
+    for _h in ALLOWED_HOSTS:
+        _h = _h.strip()
+        if _h and _h not in ('.onrender.com',):
+            _origin = f"https://{_h.lstrip('.')}"
+            if _origin not in CSRF_TRUSTED_ORIGINS:
+                CSRF_TRUSTED_ORIGINS.append(_origin)
 
 # ── Apps ──────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    'jazzmin',                          # DOIT etre avant django.contrib.admin
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -86,7 +85,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'kingch_project.wsgi.application'
 
-# ── Base de données ───────────────────────────────────────────────────────────
+# ── Base de donnees ───────────────────────────────────────────────────────────
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -94,7 +93,6 @@ DATABASES = {
     }
 }
 
-# PostgreSQL sur Render (si DATABASE_URL est definie)
 if os.environ.get('DATABASE_URL'):
     import dj_database_url
     DATABASES['default'] = dj_database_url.config(
@@ -125,14 +123,10 @@ USE_TZ        = True
 STATIC_URL  = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# En local, on lit depuis le dossier static/ du projet
-# En prod, collectstatic copie tout dans staticfiles/
 if DEBUG:
     STATICFILES_DIRS = [BASE_DIR / 'static']
-    # Pas de CompressedManifest en dev (evite les erreurs de manifest)
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 else:
-    # En prod seulement si static/ existe encore (optionnel)
     _static_dir = BASE_DIR / 'static'
     if _static_dir.exists():
         STATICFILES_DIRS = [_static_dir]
@@ -141,43 +135,17 @@ else:
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# ── Stockage des fichiers media (images) ───────────────────────────────────────
-# PROBLEME RESOLU : sans ceci, les photos de profil, certificats, et le logo
-# manno.png uploades depuis l'admin sont stockes sur le disque ephemere de
-# Render et disparaissent a chaque redemarrage du service.
-#
-# Deux options possibles (au choix). Si les deux sont configurees,
-# Cloudinary est utilise en priorite.
-#
-# OPTION A — Cloudinary (https://cloudinary.com)
-#   Variable a definir sur Render :
-#     CLOUDINARY_URL = cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-#
-# OPTION B — Backblaze B2 (https://www.backblaze.com)
-#   Variables a definir sur Render :
-#     B2_ACCESS_KEY_ID, B2_SECRET_ACCESS_KEY, B2_BUCKET_NAME, B2_ENDPOINT_URL
-#
-# En local (developpement), sans aucune de ces variables, le stockage
-# reste local dans media/ comme avant — rien ne change pour vous en dev.
-
-def _clean_cloudinary_url(raw_url):
-    """
-    Nettoie et valide la variable CLOUDINARY_URL pour eviter le crash
-    'Invalid CLOUDINARY_URL scheme' cause par des espaces, guillemets,
-    ou un prefixe 'cloudinary://' manquant/duplique.
-    Retourne None si la valeur est invalide ou absente.
-    """
-    if not raw_url:
+# ── Stockage des fichiers media (Cloudinary ou Backblaze B2) ─────────────────
+def _clean_cloudinary_url(raw):
+    if not raw:
         return None
-    url = raw_url.strip().strip('"').strip("'")
+    url = raw.strip().strip('"').strip("'")
     if not url:
         return None
-    # Corrige les variantes mal formees du prefixe
     if url.startswith('cloudinary:') and not url.startswith('cloudinary://'):
         url = 'cloudinary://' + url[len('cloudinary:'):]
     elif not url.startswith('cloudinary://'):
         url = 'cloudinary://' + url
-    # Verification minimale du format attendu : cloudinary://key:secret@cloud
     body = url[len('cloudinary://'):]
     if '@' not in body or ':' not in body.split('@')[0]:
         return None
@@ -188,72 +156,72 @@ _cloudinary_raw   = os.environ.get('CLOUDINARY_URL', '')
 _cloudinary_clean = _clean_cloudinary_url(_cloudinary_raw)
 
 if _cloudinary_raw and not _cloudinary_clean:
-    # La variable existe mais est mal formee — on previent dans les logs
-    # au lieu de laisser Django planter au demarrage.
     print(
-        "ATTENTION: CLOUDINARY_URL est definie mais mal formee. "
-        "Format attendu: cloudinary://API_KEY:API_SECRET@CLOUD_NAME — "
-        "le stockage local sera utilise a la place (non persistant)."
+        "[KING CH] ATTENTION: CLOUDINARY_URL mal formee. "
+        "Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME"
     )
 
 if _cloudinary_clean:
-    os.environ['CLOUDINARY_URL'] = _cloudinary_clean  # normalise pour le SDK
-    # ── OPTION A : Cloudinary ──────────────────────────────────────────────
+    os.environ['CLOUDINARY_URL'] = _cloudinary_clean
     INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    print("[KING CH] Cloudinary actif — images persistantes.")
 
 elif os.environ.get('B2_ACCESS_KEY_ID'):
-    # ── OPTION B : Backblaze B2 (compatible S3) ────────────────────────────
     INSTALLED_APPS += ['storages']
-
-    AWS_ACCESS_KEY_ID       = os.environ.get('B2_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY   = os.environ.get('B2_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME')
-    AWS_S3_ENDPOINT_URL     = os.environ.get('B2_ENDPOINT_URL')
-    AWS_S3_REGION_NAME      = os.environ.get('B2_REGION', 'us-west-004')
-
+    AWS_ACCESS_KEY_ID        = os.environ.get('B2_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY    = os.environ.get('B2_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME  = os.environ.get('B2_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL      = os.environ.get('B2_ENDPOINT_URL')
+    AWS_S3_REGION_NAME       = os.environ.get('B2_REGION', 'us-west-004')
     AWS_DEFAULT_ACL          = 'public-read'
     AWS_QUERYSTRING_AUTH     = False
     AWS_S3_FILE_OVERWRITE    = False
     AWS_S3_SIGNATURE_VERSION = 's3v4'
-
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE     = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+    print("[KING CH] Backblaze B2 actif — images persistantes.")
+
+else:
+    if not DEBUG:
+        print("[KING CH] ATTENTION: Pas de stockage cloud configure. "
+              "Les images seront perdues au prochain redemarrage.")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ── Timer quiz (secondes par question) ───────────────────────────────────────
+QUIZ_TIMER_SECONDS = int(os.environ.get('QUIZ_TIMER_SECONDS', '10'))
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND   = 'django.core.mail.backends.console.EmailBackend'
 WHATSAPP_NUMBER = os.environ.get('WHATSAPP_NUMBER', '50938000000')
 
 # ── Session ───────────────────────────────────────────────────────────────────
-SESSION_COOKIE_AGE            = 86400  # 24 h
+SESSION_COOKIE_AGE              = 86400
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-# ── Securite (PRODUCTION UNIQUEMENT) ─────────────────────────────────────────
-# En local DEBUG=True => aucun de ces parametres n'est actif
-# => plus d'erreur ERR_SSL_PROTOCOL_ERROR
+# ── Securite production ───────────────────────────────────────────────────────
 if not DEBUG:
-    SECURE_SSL_REDIRECT           = True   # force HTTPS seulement en prod
-    SECURE_HSTS_SECONDS           = 31536000
+    SECURE_SSL_REDIRECT            = True
+    SECURE_HSTS_SECONDS            = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD           = True
-    SECURE_CONTENT_TYPE_NOSNIFF   = True
-    SECURE_BROWSER_XSS_FILTER     = True
-    X_FRAME_OPTIONS               = 'DENY'
-    CSRF_COOKIE_SECURE            = True
-    SESSION_COOKIE_SECURE         = True
-    SESSION_COOKIE_HTTPONLY       = True
-    CSRF_COOKIE_HTTPONLY          = True
+    SECURE_HSTS_PRELOAD            = True
+    SECURE_CONTENT_TYPE_NOSNIFF    = True
+    SECURE_BROWSER_XSS_FILTER      = True
+    X_FRAME_OPTIONS                = 'DENY'
+    CSRF_COOKIE_SECURE             = True
+    SESSION_COOKIE_SECURE          = True
+    SESSION_COOKIE_HTTPONLY        = True
+    CSRF_COOKIE_HTTPONLY           = True
 
 # ── Jazzmin ───────────────────────────────────────────────────────────────────
 JAZZMIN_SETTINGS = {
     "site_title":        "KING CH Admin",
     "site_header":       "KING CH",
     "site_brand":        "KING CH",
-    "site_logo":         "images/manno.png",   # shown in sidebar
-    "login_logo":        None,                  # no logo on login page
-    "login_logo_dark":   None,                  # no logo on login page
+    "site_logo":         "images/manno.png",
+    "login_logo":        None,
+    "login_logo_dark":   None,
     "site_logo_classes": "img-circle elevation-3",
     "site_icon":         "images/manno.png",
     "welcome_sign":      "Bienvenue dans le panneau KING CH",
@@ -276,7 +244,7 @@ JAZZMIN_SETTINGS = {
     "order_with_respect_to": [
         "auth", "quiz",
         "quiz.UserProfile", "quiz.DailyQuestion",
-        "quiz.UserAnswer",  "quiz.Certificate", "quiz.Notification",
+        "quiz.UserAnswer", "quiz.Certificate", "quiz.Notification",
     ],
     "icons": {
         "auth":               "fas fa-users-cog",
